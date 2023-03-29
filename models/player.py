@@ -36,8 +36,8 @@ class Player:
     bowling_hand: str
     bowling_style: str
     team: team.Team
+    country: str
     captain: bool = False
-    overseas: bool = False
 
     def make_captain(self):
         """

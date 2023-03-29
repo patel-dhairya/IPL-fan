@@ -23,11 +23,15 @@ async def get_player_info(session, player):
     async with session.get(player) as player_information:
         soup = BeautifulSoup(await player_information.content.read(), "html.parser")
         information = soup.find_all(class_="cb-col cb-col-60 cb-lst-itm-sm")
+        player_country = soup.find_all(class_="cb-font-18 text-gray")
+        player_name = soup.find_all(class_ = "cb-font-40")
         new_information = [info.text for info in information]
+        new_information.extend(info.text for info in player_country)
+        new_information.extend(info.text for info in player_name)
         return new_information
 
 
-async def main():
-    info = await get_player_async("https://www.cricbuzz.com/cricket-team/gujarat-titans/971/players")
+async def main(url):
+    info = await get_player_async(url)
     return info
 
