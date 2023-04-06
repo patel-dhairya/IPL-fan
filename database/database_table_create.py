@@ -12,9 +12,11 @@ def team_db_create() -> None:
     :return: None
     """
     ipl_db = sqlite3.connect("ipl.db")
-    ipl_db.execute('''
-        CREATE TABLE teams (
-            short_name TEXT PRIMARY KEY,
+    ipl_cursor = ipl_db.cursor()
+    ipl_cursor.execute('''
+        CREATE TABLE IF NOT EXISTS teams (
+            team_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            short_name TEXT NOT NULL,
             team_name TEXT NOT NULL,
             home_stadium TEXT NOT NULL
         )
@@ -33,6 +35,7 @@ def team_db_create() -> None:
     ipl_db.execute(insert_team, ("Lucknow Super Giants", "LSG", "Atal Bihari Vajpayee Ekana Cricket Stadium"))
 
     ipl_db.commit()
+    ipl_cursor.close()
     ipl_db.close()
 
 
@@ -60,9 +63,11 @@ def player_db_create() -> None:
     :return: None
     """
     ipl_db = sqlite3.connect("ipl.db")
-    ipl_db.execute('''
-     CREATE TABLE players (
-        player_name TEXT PRIMARY KEY,
+    ipl_cursor = ipl_db.cursor()
+    ipl_cursor.execute('''
+     CREATE TABLE IF NOT EXISTS players (
+        player_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        player_name TEXT NOT NULL,
         age INTEGER NOT NULL,
         position TEXT NOT NULL,
         batting_hand TEXT NOT NULL,
@@ -77,16 +82,19 @@ def player_db_create() -> None:
         csv_data = csv.reader(file)
         next(csv_data)  # Skip header
         for row in csv_data:
-            ipl_db.execute("INSERT INTO players VALUES (?, ?, ?, ?, ?, ?, ?, ?)", row[:-1])
+            ipl_cursor.execute("INSERT INTO players (player_name, age, position, batting_hand, bowling_hand, "
+                               "bowling_type, team, home_country) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", row[:-1])
 
     ipl_db.commit()
+    ipl_cursor.close()
     ipl_db.close()
 
 
 def match_db_create() -> None:
     ipl_db = sqlite3.connect("ipl.db")
-    ipl_db.execute('''
-    CREATE TABLE matches (
+    ipl_cursor = ipl_db.cursor()
+    ipl_cursor.execute('''
+    CREATE TABLE IF NOT EXISTS matches (
         match_id INTEGER PRIMARY KEY,
         home_team TEXT NOT NULL,
         away_team TEXT NOT NULL,
@@ -119,8 +127,74 @@ def match_db_create() -> None:
         )
     ''')
     ipl_db.commit()
+    ipl_cursor.close()
     ipl_db.close()
 
+
+def player_stat_db_create() -> None:
+    ipl_db = sqlite3.connect("ipl.db")
+    ipl_cursor = ipl_db.cursor()
+    ipl_cursor.execute('''
+    CREATE TABLE IF NOT EXISTS player_stat (
+        player_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        player_name TEXT NOT NULL,
+        match_played INTEGER NOT NULL DEFAULT 0,
+        batting_runs_scored INTEGER NOT NULL DEFAULT 0,
+        batting_bowls_played INTEGER NOT NULL DEFAULT 0,
+        batting_boundary INTEGER NOT NULL DEFAULT 0,
+        batting_six INTEGER NOT NULL DEFAULT 0,
+        batting_half_century INTEGER NOT NULL DEFAULT 0,
+        batting_century INTEGER NOT NULL DEFAULT 0,
+        batting_duck_out INTEGER NOT NULL DEFAULT 0,
+        highest_score INTEGER NOT NULL DEFAULT 0,
+        batting_not_out INTEGER NOT NULL DEFAULT 0
+        out_catch INTEGER NOT NULL DEFAULT 0,
+        out_run_out INTEGER NOT NULL DEFAULT 0,
+        out_stumped INTEGER NOT NULL DEFAULT 0,
+        out_bowled INTEGER NOT NULL DEFAULT 0,
+        field_catch INTEGER NOT NULL DEFAULT 0,
+        field_run_out INTEGER NOT NULL DEFAULT 0,
+        field_stumping INTEGER NOT NULL DEFAULT 0,
+        field_catch_miss INTEGER NOT NULL DEFAULT 0,
+        bowling_bowls INTEGER NOT NULL DEFAULT 0,
+        bowling_runs INTEGER NOT NULL DEFAULT 0,
+        bowling_wickets INTEGER NOT NULL DEFAULT 0,
+        bowling_wicket_catch INTEGER NOT NULL DEFAULT 0,
+        bowling_wicket_bowled INTEGER NOT NULL DEFAULT 0,
+        bowling_wicket_stump INTEGER NOT NULL DEFAULT 0,
+        bowling_best_figure TEXT NOT NULL DEFAULT '0/0',
+        bowling_five_wickets INTEGER NOT NULL DEFAULT 0,
+    ''')
+#
+# def player_stat_db_add(player_name, batting_run=0, batting_bowl=0, batting_4=0, batting_6=0, out_style=None,
+#                        not_out=False, catch=0, run_out=0, catch_miss=0, stumping=0, bowling_bowl=0, bowling_run=0,
+#                        wicket_taken=0, wicket_taken_catch=0, wicket_taken_bowled=0, wicket_taken_stump=0) -> None:
+#     """
+#         Adds data to the player's record for a match they played in
+#
+#         Parameters:
+#         player_name (str): the name of player
+#         batting_run (int): the number of runs scored by the player while batting
+#         batting_bowl (int): the number of balls faced by the player while batting
+#         batting_4 (int): the number of fours scored by the player while batting
+#         batting_6 (int): the number of sixes scored by the player while batting
+#         out_style (str): the way the player was dismissed (catch, run-out, stump, bowled) or None if not out
+#         not_out (bool): True if the player was not out, False otherwise
+#         catch (int): the number of catches taken by the player in the field
+#         run_out (int): the number of run outs executed by the player in the field
+#         catch_miss (int): the number of catches missed by the player in the field
+#         stumping (int): the number of stumpings executed by the player in the field
+#         bowling_bowl (int): the number of balls bowled by the player
+#         bowling_run (int): the number of runs given away by the player while bowling
+#         wicket_taken (int): the number of wickets taken by the player while bowling
+#         wicket_taken_catch (int): the number of wickets taken by the player through catches
+#         wicket_taken_bowled (int): the number of wickets taken by the player through bowleds
+#         wicket_taken_stump (int): the number of wickets taken by the player through stumpings
+#
+#         Returns:
+#         None
+#         """
+#     ipl_db = sqlite3.connect("ipl.db")
 
 # team_db_write()
 # player_db_create()
