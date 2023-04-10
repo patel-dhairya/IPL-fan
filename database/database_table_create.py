@@ -266,7 +266,7 @@ def player_stat_db_create() -> None:
 
     ipl_cursor.execute('''
     CREATE TABLE IF NOT EXISTS player_stat (
-        player_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        player_id INTEGER PRIMARY KEY,
         player_name TEXT NOT NULL,
         match_played INTEGER NOT NULL DEFAULT 0,
         batting_runs_scored INTEGER NOT NULL DEFAULT 0,
@@ -277,7 +277,7 @@ def player_stat_db_create() -> None:
         batting_century INTEGER NOT NULL DEFAULT 0,
         batting_duck_out INTEGER NOT NULL DEFAULT 0,
         highest_score INTEGER NOT NULL DEFAULT 0,
-        batting_not_out INTEGER NOT NULL DEFAULT 0
+        batting_not_out INTEGER NOT NULL DEFAULT 0,
         out_catch INTEGER NOT NULL DEFAULT 0,
         out_run_out INTEGER NOT NULL DEFAULT 0,
         out_stumped INTEGER NOT NULL DEFAULT 0,
@@ -291,9 +291,17 @@ def player_stat_db_create() -> None:
         bowling_wicket_catch INTEGER NOT NULL DEFAULT 0,
         bowling_wicket_bowled INTEGER NOT NULL DEFAULT 0,
         bowling_wicket_stump INTEGER NOT NULL DEFAULT 0,
-        bowling_best_figure TEXT NOT NULL DEFAULT '0/0' CHECK(score_inning1 LIKE '%/%' AND score_inning1 GLOB 
-        '[0-9]*/[0-9]*'),
-        bowling_five_wickets INTEGER NOT NULL DEFAULT 0,
+        bowling_best_figure TEXT NOT NULL DEFAULT '0/0' CHECK(bowling_best_figure LIKE '%/%' AND 
+        bowling_best_figure GLOB '[0-9]*/[0-9]*'),
+        bowling_five_wickets INTEGER NOT NULL DEFAULT 0
+        )
+    ''')
+
+    # Copy the name of player from original player database
+    ipl_cursor.execute('''
+        INSERT INTO player_stat (player_id, player_name)
+        SELECT player_id, player_name
+        FROM players
     ''')
 
     ipl_db.commit()
@@ -301,7 +309,7 @@ def player_stat_db_create() -> None:
     ipl_db.close()
 
 
-
-# team_db_write()
+# team_db_create()
 # player_db_create()
 # match_db_create()
+# player_stat_db_create()

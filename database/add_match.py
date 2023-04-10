@@ -25,11 +25,3 @@ def add_match(match_id, home_team, away_team, toss_win, toss_win_field_first, wi
     except sqlite3.IntegrityError:
         print(f"Match-{match_id} already exist in database")
         return f"Match-{match_id} already exist in database"
-
-
-# Match-1
-add_match(1, "GT", "CSK", "GT", 1, "GT", "Rashid Khan", 1, "178/7", "182/5", 92, "Ruturaj Gaikwad", "Rashid Khan",
-          "26/2", 63, "Shubman Gill", "Rajvardhan Hangargekar", "36/3")
-
-# Match-2
-# add_match(2, "PBKS", "KKR", "KKR", 1, "PBKS", "Arshdeep Singh", 1, )

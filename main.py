@@ -9,7 +9,7 @@ Please look at script.py file in scrapper directory if you want to change how to
 # from database import player_csv_create
 # player_csv_create.csv_write()
 
-player_data = pd.read_csv("player-data.csv")
+player_data = pd.read_csv("database/player-data.csv")
 
 
 def research_question1(pd_data):
