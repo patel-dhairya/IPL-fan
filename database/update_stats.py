@@ -55,7 +55,7 @@ def update_player_stat(player_name, batting_run=0, batting_bowl=0, batting_4=0, 
 
     # Check if new score of player is higher than previous highest score
     current_high_score = \
-    ipl_cursor.execute('SELECT highest_score FROM player_stat WHERE name = ?', (player_name,)).fetchone()[0]
+        ipl_cursor.execute('SELECT highest_score FROM player_stat WHERE name = ?', (player_name,)).fetchone()[0]
     new_high_score = max(batting_run, current_high_score)
 
     # Type of how player got out
