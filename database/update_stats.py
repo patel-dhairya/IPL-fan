@@ -1,8 +1,8 @@
 import sqlite3
 
 
-def update_player_stat(player_name, batting_run=0, batting_bowl=0, batting_4=0, batting_6=0, out_style=None,
-                       not_out=False, catch=0, run_out=0, stumping=0, bowling_bowl=0, bowling_run=0,
+def update_player_stat(player_name, match_id, opponent_team, batting_run=0, batting_bowl=0, batting_4=0, batting_6=0,
+                       out_style=None, not_out=0, catch=0, run_out=0, stumping=0, bowling_bowl=0, bowling_run=0,
                        wicket_taken=0, wicket_taken_catch=0, wicket_taken_bowled=0, wicket_taken_stump=0):
     """
             Adds data to the player's record for a match they played in
@@ -13,7 +13,7 @@ def update_player_stat(player_name, batting_run=0, batting_bowl=0, batting_4=0, 
             batting_4 (int): the number of fours scored by the player while batting
             batting_6 (int): the number of sixes scored by the player while batting
             out_style (str): the way the player was dismissed (catch, run-out, stump, bowled) or None if not out
-            not_out (bool): True if the player was not out, False otherwise
+            not_out (int): 1 if the player was not out, 0 otherwise
             catch (int): the number of catches taken by the player in the field
             run_out (int): the number of run outs executed by the player in the field
             stumping (int): the number of stumpings executed by the player in the field
@@ -84,7 +84,7 @@ def update_player_stat(player_name, batting_run=0, batting_bowl=0, batting_4=0, 
     five_wickets = 1 if wicket_taken >= 5 else 0
 
     ipl_cursor.execute(query, (batting_run, batting_bowl, batting_4, batting_6, int(half_century), int(century),
-                               int(duck_out), new_high_score, int(not_out), out_catch, out_run_out, out_stumped,
+                               int(duck_out), new_high_score, not_out, out_catch, out_run_out, out_stumped,
                                out_bowled, catch, run_out, stumping, bowling_bowl, bowling_run, wicket_taken,
                                wicket_taken_catch, wicket_taken_bowled, wicket_taken_stump, new_best_bowling_figure,
                                five_wickets, player_name,))
