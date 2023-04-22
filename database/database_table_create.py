@@ -36,7 +36,7 @@ def team_db_create() -> None:
     ''')
 
     # Add teams to teams table
-    insert_team = "INSERT INTO teams (Team, 'Short Name', 'Home Stadium') VALUES (?, ?, ?)"
+    insert_team = "INSERT INTO teams (Team, \"Short Name\", \"Home Stadium\") VALUES (?, ?, ?)"
     ipl_db.execute(insert_team, ("Gujarat Titans", "GT", "Narendra Modi Stadium"))
     ipl_db.execute(insert_team, ("Chennai Super Kings", "CSK", "MA Chidambaram Stadium"))
     ipl_db.execute(insert_team, ("Delhi Capitals", "DC", "Arun Jaitley Stadium"))
@@ -84,18 +84,16 @@ def player_db_create() -> None:
     #     The home country of player
     ipl_cursor.execute('''
      CREATE TABLE IF NOT EXISTS players (
-        'Player ID' INTEGER PRIMARY KEY AUTOINCREMENT,
-        Name TEXT NOT NULL,
-        Age INTEGER NOT NULL,
-        Position TEXT NOT NULL,
-        'Batting Hand' TEXT NOT NULL,
-        'Bowling Hand' TEXT NOT NULL,
-        'Bowling Type' TEXT NOT NULL,
-        Team TEXT NOT NULL,
-        'Home Country' TEXT NOT NULL,
-        
-        FOREIGN KEY (Team) REFERENCES teams (Short Name)
-        )
+         "Player ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+         Name TEXT NOT NULL,
+         Age INTEGER NOT NULL,
+         Position TEXT NOT NULL,
+         "Batting Hand" TEXT NOT NULL,
+         "Bowling Hand" TEXT NOT NULL,
+         "Bowling Type" TEXT NOT NULL,
+         Team TEXT NOT NULL,
+         "Home Country" TEXT NOT NULL,
+         FOREIGN KEY (Team) REFERENCES teams (Short Name)
     ''')
 
     # Convert player-data in csv file to sql query format and add it to players table
@@ -103,8 +101,8 @@ def player_db_create() -> None:
         csv_data = csv.reader(file)
         next(csv_data)  # Skip header
         for row in csv_data:
-            ipl_cursor.execute("INSERT INTO players (Name, Age, Position, 'Batting Hand', 'Bowling Hand', "
-                               "'Bowling Type', Team, 'Home Country') VALUES (?, ?, ?, ?, ?, ?, ?, ?)", row[:-1])
+            ipl_cursor.execute("INSERT INTO players (Name, Age, Position, \"Batting Hand\", \"Bowling Hand\", "
+                               "\"Bowling Type\", Team, \"Home Country\") VALUES (?, ?, ?, ?, ?, ?, ?, ?)", row[:-1])
 
     ipl_db.commit()
     ipl_cursor.close()
@@ -160,37 +158,37 @@ def match_db_create() -> None:
 
     ipl_cursor.execute('''
     CREATE TABLE IF NOT EXISTS matches (
-        'Match ID' INTEGER PRIMARY KEY,
-        'Home Team' TEXT NOT NULL,
-        'Away Team' TEXT NOT NULL,
-        'Toss Win' TEXT NOT NULL,
-        'Field First' INTEGER NOT NULL CHECK (Field First IN (0, 1)),
+        "Match ID" INTEGER PRIMARY KEY,
+        "Home Team" TEXT NOT NULL,
+        "Away Team" TEXT NOT NULL,
+        "Toss Win" TEXT NOT NULL,
+        "Field First" INTEGER NOT NULL CHECK (Field First IN (0, 1)),
         Winner TEXT NOT NULL,
-        'Man of the match' TEXT NOT NULL,
-        'Match time' INTEGER NOT NULL CHECK (Match time IN (0, 1)),
-        Score(i1) TEXT NOT NULL DEFAULT '0/0' CHECK(Score(i1) LIKE '%/%' AND Score(i1) GLOB '[0-9]*/[0-9]*'),
-        Score(i2) TEXT NOT NULL DEFAULT '0/0' CHECK(Score(i2) LIKE '%/%' AND Score(i2) GLOB '[0-9]*/[0-9]*'),
-        'High score(i1)' INTEGER NOT NULL,
-        'High scorer(i1)' TEXT NOT NULL ,
-        'Best bowler(i1)' TEXT NOT NULL,
-        'Best bowling(i1)' TEXT NOT NULL DEFAULT '0/0' CHECK(Best bowling(i1) LIKE '%/%' AND Best bowling(i1) GLOB 
-        '[0-9]*/[0-9]*'),
-        'High score(i2)' INTEGER NOT NULL,
-        'High scorer(i2)' TEXT NOT NULL ,
-        'Best bowler(i2)' TEXT NOT NULL ,
-        'Best bowling(i2)' TEXT NOT NULL DEFAULT '0/0' CHECK(Best bowling(i2) LIKE '%/%' AND Best bowling(i2) GLOB 
-        '[0-9]*/[0-9]*'),
+        "Man of the match" TEXT NOT NULL,
+        "Match time" INTEGER NOT NULL CHECK (Match time IN (0, 1)),
+        Score(i1) TEXT NOT NULL DEFAULT "0/0" CHECK(Score(i1) LIKE "%/%" AND Score(i1) GLOB "[0-9]*/[0-9]*"),
+        Score(i2) TEXT NOT NULL DEFAULT "0/0" CHECK(Score(i2) LIKE "%/%" AND Score(i2) GLOB "[0-9]*/[0-9]*"),
+        "High score(i1)" INTEGER NOT NULL,
+        "High scorer(i1)" TEXT NOT NULL ,
+        "Best bowler(i1)" TEXT NOT NULL,
+        "Best bowling(i1)" TEXT NOT NULL DEFAULT "0/0" CHECK(Best bowling(i1) LIKE "%/%" AND Best bowling(i1) GLOB 
+        "[0-9]*/[0-9]*"),
+        "High score(i2)" INTEGER NOT NULL,
+        "High scorer(i2)" TEXT NOT NULL ,
+        "Best bowler(i2)" TEXT NOT NULL ,
+        "Best bowling(i2)" TEXT NOT NULL DEFAULT "0/0" CHECK(Best bowling(i2) LIKE "%/%" AND Best bowling(i2) GLOB 
+        "[0-9]*/[0-9]*"),
         
 
-        FOREIGN KEY ('Home Team') REFERENCES teams ('Short Name'),
-        FOREIGN KEY ('Away Team') REFERENCES teams ('Short Name'),
-        FOREIGN KEY ('Toss Win') REFERENCES teams ('Short Name'),
-        FOREIGN KEY (Winner) REFERENCES teams ('Short Name'),
-        FOREIGN KEY ('Man of the match') REFERENCES players (Name),
-        FOREIGN KEY ('High scorer(i1)') REFERENCES players (Name),
-        FOREIGN KEY ('Best bowler(i1)') REFERENCES players (Name),
-        FOREIGN KEY ('High scorer(i2)') REFERENCES players (Name),
-        FOREIGN KEY ('Best bowler(i2)') REFERENCES players (Name)
+        FOREIGN KEY ("Home Team") REFERENCES teams ("Short Name"),
+        FOREIGN KEY ("Away Team") REFERENCES teams ("Short Name"),
+        FOREIGN KEY ("Toss Win") REFERENCES teams ("Short Name"),
+        FOREIGN KEY (Winner) REFERENCES teams ("Short Name"),
+        FOREIGN KEY ("Man of the match") REFERENCES players (Name),
+        FOREIGN KEY ("High scorer(i1)") REFERENCES players (Name),
+        FOREIGN KEY ("Best bowler(i1)") REFERENCES players (Name),
+        FOREIGN KEY ("High scorer(i2)") REFERENCES players (Name),
+        FOREIGN KEY ("Best bowler(i2)") REFERENCES players (Name)
         )
     ''')
     ipl_db.commit()
@@ -265,42 +263,42 @@ def player_total_stats_db_create() -> None:
     #     Number of times player has taken 5 wickets or more in single match
 
     ipl_cursor.execute('''
-    CREATE TABLE IF NOT EXISTS 'Player Stats Summary' (
-        'Player ID' INTEGER PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS "Player Stats Summary" (
+        "Player ID" INTEGER PRIMARY KEY,
         Name TEXT NOT NULL,
-        'Match Played' INTEGER NOT NULL DEFAULT 0,
-        'Runs (bat)' INTEGER NOT NULL DEFAULT 0,
-        'Bowls (bat)' INTEGER NOT NULL DEFAULT 0,
+        "Match Played" INTEGER NOT NULL DEFAULT 0,
+        "Runs (bat)" INTEGER NOT NULL DEFAULT 0,
+        "Bowls (bat)" INTEGER NOT NULL DEFAULT 0,
         4s INTEGER NOT NULL DEFAULT 0,
         6s INTEGER NOT NULL DEFAULT 0,
-        'Half Centuries' INTEGER NOT NULL DEFAULT 0,
-        'Centuries' INTEGER NOT NULL DEFAULT 0,
-        'Duck outs' INTEGER NOT NULL DEFAULT 0,
-        'Highest Score' INTEGER NOT NULL DEFAULT 0,
+        "Half Centuries" INTEGER NOT NULL DEFAULT 0,
+        "Centuries" INTEGER NOT NULL DEFAULT 0,
+        "Duck outs" INTEGER NOT NULL DEFAULT 0,
+        "Highest Score" INTEGER NOT NULL DEFAULT 0,
         NO INTEGER NOT NULL DEFAULT 0,
-        'Out (catch)' INTEGER NOT NULL DEFAULT 0,
-        'Out (run out)' INTEGER NOT NULL DEFAULT 0,
-        'Out (stumped)' INTEGER NOT NULL DEFAULT 0,
-        'Out (bowled)' INTEGER NOT NULL DEFAULT 0,
-        'Catches (field)' INTEGER NOT NULL DEFAULT 0,
-        'Run outs (field)' INTEGER NOT NULL DEFAULT 0,
-        'Stumping (field)' INTEGER NOT NULL DEFAULT 0,
-        'Bowls (ball)' INTEGER NOT NULL DEFAULT 0,
-        'Runs Conceded' INTEGER NOT NULL DEFAULT 0,
+        "Out (catch)" INTEGER NOT NULL DEFAULT 0,
+        "Out (run out)" INTEGER NOT NULL DEFAULT 0,
+        "Out (stumped)" INTEGER NOT NULL DEFAULT 0,
+        "Out (bowled)" INTEGER NOT NULL DEFAULT 0,
+        "Catches (field)" INTEGER NOT NULL DEFAULT 0,
+        "Run outs (field)" INTEGER NOT NULL DEFAULT 0,
+        "Stumping (field)" INTEGER NOT NULL DEFAULT 0,
+        "Bowls (ball)" INTEGER NOT NULL DEFAULT 0,
+        "Runs Conceded" INTEGER NOT NULL DEFAULT 0,
         Wickets INTEGER NOT NULL DEFAULT 0,
-        'Wicket-catch' INTEGER NOT NULL DEFAULT 0,
-        'Wicket-bowled' INTEGER NOT NULL DEFAULT 0,
-        'Wicket-stumped' INTEGER NOT NULL DEFAULT 0,
-        'Best Figure' TEXT NOT NULL DEFAULT '0/0' CHECK('Best Figure' LIKE '%/%' AND 'Best Figure' GLOB '[0-9]*/[0-9]*')
+        "Wicket-catch" INTEGER NOT NULL DEFAULT 0,
+        "Wicket-bowled" INTEGER NOT NULL DEFAULT 0,
+        "Wicket-stumped" INTEGER NOT NULL DEFAULT 0,
+        "Best Figure" TEXT NOT NULL DEFAULT "0/0" CHECK("Best Figure" LIKE "%/%" AND "Best Figure" GLOB "[0-9]*/[0-9]*")
         ,
-        'Five Wickets' INTEGER NOT NULL DEFAULT 0
+        "Five Wickets" INTEGER NOT NULL DEFAULT 0
         )
     ''')
 
     # Copy the name of player from original player database
     ipl_cursor.execute('''
-        INSERT INTO player_stat_summary ('Player ID', Name)
-        SELECT 'Player Id', Name
+        INSERT INTO player_stat_summary ("Player ID", Name)
+        SELECT "Player Id", Name
         FROM players
     ''')
 
@@ -336,44 +334,38 @@ def player_bat_stat_db_create() -> None:
     #     The total number of 4s scored by the player in this match
     # 6s : int
     #     The total number of 6s scored by the player in this match
-    # batting_not_out : int
-    #     Shows weather player was not out while batting in this match
-    # out_type : str
+    # Not out : int
+    #     Shows weather player was not out while batting in this match. 0 for out and 1 for not out.
+    # Out type : str
     #     Shows how player got out in this match if player batted in this match
-    # field_catch : int
-    #     The total number of catches taken by the player in the field in this match
-    # field_run_out : int
-    #     The total number of run outs player was associated with in this match
-    # field_stumping : int
-    #     The total number of times the player has stumped out a batsman in this match
-    # bowling_bowls : int
-    #     The total number of balls bowled by the player in this match
-    # bowling_runs : int
-    #     The total number of runs given by the player while bowling in this match
-    # bowling_wickets : int
-    #     The total number of wickets taken by the player in this match
-    # man_of_the_match : int
+    # Out bowler : str
+    #     Shows which bowler was responsible if player got out by bowled, stumped or caught. None if player was not out
+    #     or got run out
+    # Fielder : str
+    #     Show which fielder was responsible for player dismissal if player got caught, stumped or run out. None if
+    #     player was not out or got bowled
+    # Man of the match : int
     #     1 if performance of player received man of the match award
 
     ipl_cursor.execute('''
     CREATE TABLE IF NOT EXISTS player_stat_individual (
-        player_id INTEGER PRIMARY KEY,
-        player_name TEXT NOT NULL,
-        match_id INTEGER NOT NULL,
-        opponent_team TEXT NOT NULL,
-        batting_runs INTEGER NOT NULL DEFAULT 0,
-        batting_bowls INTEGER NOT NULL DEFAULT 0,
-        batting_boundary INTEGER NOT NULL DEFAULT 0,
-        batting_six INTEGER NOT NULL DEFAULT 0,
-        batting_not_out INTEGER NOT NULL DEFAULT 0,
-        out_type TEXT NOT NULL DEFAULT 'Not Applicable',
+        "Player ID" INTEGER PRIMARY KEY,
+        Name TEXT NOT NULL,
+        "Match ID" INTEGER NOT NULL,
+        Opponent TEXT NOT NULL,
+        Runs INTEGER NOT NULL DEFAULT 0,
+        Bowls INTEGER NOT NULL DEFAULT 0,
+        4s INTEGER NOT NULL DEFAULT 0,
+        6s INTEGER NOT NULL DEFAULT 0,
+        "Not out" INTEGER NOT NULL DEFAULT 0,
+        "Out type" TEXT NOT NULL DEFAULT "None",
         field_catch INTEGER NOT NULL DEFAULT 0,
         field_run_out INTEGER NOT NULL DEFAULT 0,
         field_stumping INTEGER NOT NULL DEFAULT 0,
         bowling_bowls INTEGER NOT NULL DEFAULT 0,
         bowling_runs INTEGER NOT NULL DEFAULT 0,
         bowling_wickets INTEGER NOT NULL DEFAULT 0,
-        man_of_the_match INTEGER NOT NULL CHECK (man_of_the_match IN (0, 1)),
+        "Man of the match" INTEGER NOT NULL CHECK ("Man of the match" IN (0, 1)),
         
         FOREIGN KEY (match_id) REFERENCES matches (match_id),
         FOREIGN KEY (opponent_team) REFERENCES teams (short_name)
@@ -392,8 +384,59 @@ def player_bat_stat_db_create() -> None:
     ipl_db.close()
 
 
+def player_bowl_stat_db_create() -> None:
+    """
+        Create a table of statistics of players in ipl database
+        This table will show player's individual performance/stat regarding bowling/fielding against each opponent
+        :return: None
+        """
+
+    # Create a connection to the database
+    ipl_db = sqlite3.connect("ipl.db")
+    ipl_cursor = ipl_db.cursor()
+
+    # Rows information
+    # -----------
+    # Name : str
+    #   The name of the player.
+    # Match ID : int
+    #   The id of match for player's performance
+    # Opponent : str
+    #   Opponent team in this match
+    # Bowls : int
+    #     The total number of balls bowled by the player in this match
+    # Runs conceded : int
+    #     The total number of runs given by the player while bowling in this match
+    # Wickets : int
+    #     The total number of wickets taken by the player in this match
+    # Maiden over : int
+    #     The total number of maiden overs thrown by bowler (maiden over = 0 runs in over)
+    # Dot ball : int
+    #     The total number of dot balls thrown by bowler (dot ball = 0 run conceded)
+    # 4s conceded : int
+    #     Number of boundaries conceded by bowler
+    # 6s conceded : int
+    #     Number of sixes conceded by bowler
+    # Wides : int
+    #     Number of wides thrown by bowler
+    # No balls : int
+    #     Number of no balls thrown by bowler
+    # Wicket-catch : int
+    #     The total number of wickets taken by the bowler through catches in this match
+    # Wicket-bowled : int
+    #     The total number of wickets taken by the bowler by hitting the wicket with a ball in this match
+    # Wicket-stumped : int
+    #     The total number of wickets taken by the bowler through stump out in this match
+    # Field-catch : int
+    #     The total number of catches taken by the player in the field in this match
+    # Field-runout : int
+    #     The total number of run outs player was associated with in this match
+    # Field-stumping : int
+    #     The total number of times the player has stumped out a batsman in this match
+
+
 team_db_create()
 player_db_create()
 match_db_create()
 player_total_stats_db_create()
-player_match_stat_db_create()
+# player_match_stat_db_create()
