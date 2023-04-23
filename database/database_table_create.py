@@ -28,7 +28,7 @@ def team_db_create() -> None:
     #   Name of home stadium of team
     ipl_cursor.execute('''
         CREATE TABLE IF NOT EXISTS teams (
-            Team ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            "Team ID" INTEGER PRIMARY KEY AUTOINCREMENT,
             Team TEXT NOT NULL,
             "Short Name" TEXT NOT NULL,
             "Home Stadium" TEXT NOT NULL
@@ -93,7 +93,8 @@ def player_db_create() -> None:
          "Bowling Type" TEXT NOT NULL,
          Team TEXT NOT NULL,
          "Home Country" TEXT NOT NULL,
-         FOREIGN KEY (Team) REFERENCES teams (Short Name)
+         FOREIGN KEY (Team) REFERENCES teams ("Short Name")
+         )
     ''')
 
     # Convert player-data in csv file to sql query format and add it to players table
@@ -162,21 +163,21 @@ def match_db_create() -> None:
         "Home Team" TEXT NOT NULL,
         "Away Team" TEXT NOT NULL,
         "Toss Win" TEXT NOT NULL,
-        "Field First" INTEGER NOT NULL CHECK (Field First IN (0, 1)),
+        "Field First" INTEGER NOT NULL CHECK ("Field First" IN (0, 1)),
         Winner TEXT NOT NULL,
         "Man of the match" TEXT NOT NULL,
-        "Match time" INTEGER NOT NULL CHECK (Match time IN (0, 1)),
-        Score(i1) TEXT NOT NULL DEFAULT '0/0' CHECK(Score(i1) LIKE '%/%' AND Score(i1) GLOB '[0-9]*/[0-9]*'),
-        Score(i2) TEXT NOT NULL DEFAULT '0/0' CHECK(Score(i2) LIKE '%/%' AND Score(i2) GLOB '[0-9]*/[0-9]*'),
+        "Match time" INTEGER NOT NULL CHECK ("Match time" IN (0, 1)),
+        "Score(i1)" TEXT NOT NULL DEFAULT '0/0' CHECK("Score(i1)" LIKE '%/%' AND "Score(i1)" GLOB '[0-9]*/[0-9]*'),
+        "Score(i2)" TEXT NOT NULL DEFAULT '0/0' CHECK("Score(i2)" LIKE '%/%' AND "Score(i2)" GLOB '[0-9]*/[0-9]*'),
         "High score(i1)" INTEGER NOT NULL,
         "High scorer(i1)" TEXT NOT NULL ,
         "Best bowler(i1)" TEXT NOT NULL,
-        "Best bowling(i1)" TEXT NOT NULL DEFAULT '0/0' CHECK(Best bowling(i1) LIKE '%/%' AND Best bowling(i1) GLOB 
+        "Best bowling(i1)" TEXT NOT NULL DEFAULT '0/0' CHECK("Best bowling(i1)" LIKE '%/%' AND "Best bowling(i1)" GLOB 
         '[0-9]*/[0-9]*'),
         "High score(i2)" INTEGER NOT NULL,
         "High scorer(i2)" TEXT NOT NULL ,
         "Best bowler(i2)" TEXT NOT NULL ,
-        "Best bowling(i2)" TEXT NOT NULL DEFAULT '0/0' CHECK(Best bowling(i2) LIKE '%/%' AND Best bowling(i2) GLOB 
+        "Best bowling(i2)" TEXT NOT NULL DEFAULT '0/0' CHECK("Best bowling(i2)" LIKE '%/%' AND "Best bowling(i2)" GLOB 
         '[0-9]*/[0-9]*'),
         
 
@@ -273,8 +274,8 @@ def player_total_stats_db_create() -> None:
         "Match Played" INTEGER NOT NULL DEFAULT 0,
         "Runs (bat)" INTEGER NOT NULL DEFAULT 0,
         "Bowls (bat)" INTEGER NOT NULL DEFAULT 0,
-        4s INTEGER NOT NULL DEFAULT 0,
-        6s INTEGER NOT NULL DEFAULT 0,
+        "4s" INTEGER NOT NULL DEFAULT 0,
+        "6s" INTEGER NOT NULL DEFAULT 0,
         "Half Centuries" INTEGER NOT NULL DEFAULT 0,
         "Centuries" INTEGER NOT NULL DEFAULT 0,
         "Duck outs" INTEGER NOT NULL DEFAULT 0,
@@ -303,7 +304,7 @@ def player_total_stats_db_create() -> None:
 
     # Copy the name of player from original player database
     ipl_cursor.execute('''
-        INSERT INTO player_stat_summary ("Player ID", Name)
+        INSERT INTO "Player Stats Summary" ("Player ID", Name)
         SELECT "Player Id", Name
         FROM players
     ''')
@@ -364,8 +365,8 @@ def player_bat_stat_db_create() -> None:
         Opponent TEXT NOT NULL,
         Runs INTEGER NOT NULL DEFAULT 0,
         Bowls INTEGER NOT NULL DEFAULT 0,
-        4s INTEGER NOT NULL DEFAULT 0,
-        6s INTEGER NOT NULL DEFAULT 0,
+        "4s" INTEGER NOT NULL DEFAULT 0,
+        "6s" INTEGER NOT NULL DEFAULT 0,
         "Not out" INTEGER NOT NULL DEFAULT 0 CHECK ("Not out" IN (0, 1)),
         "Out type" TEXT NOT NULL DEFAULT 'None',
         "Wicket bowling style" TEXT NOT NULL DEFAULT 'None',
@@ -373,6 +374,7 @@ def player_bat_stat_db_create() -> None:
         Fielder TEXT NOT NULL DEFAULT 'None',
         "Man of the match" INTEGER NOT NULL CHECK ("Man of the match" IN (0, 1)),
         
+        FOREIGN KEY (Name) REFERENCES players (Name), 
         FOREIGN KEY ("Match ID") REFERENCES matches ("Match ID"),
         FOREIGN KEY (Opponent) REFERENCES teams ("Short Name"),
         FOREIGN KEY ("Wicket bowler") REFERENCES players (Name), 
@@ -459,13 +461,27 @@ def player_bowl_stat_db_create() -> None:
         "Wicket-lbw" INTEGER NOT NULL DEFAULT 0,
         "Field-catch" INTEGER NOT NULL DEFAULT 0,
         "Field-runout" INTEGER NOT NULL DEFAULT 0,
-        "Field-stumping" INTEGER NOT NULL DEFAULT 0
-    
-    
+        "Field-stumping" INTEGER NOT NULL DEFAULT 0,
+        
+        FOREIGN KEY (Name) REFERENCES players (Name), 
+        FOREIGN KEY ("Match ID") REFERENCES matches ("Match ID"),
+        FOREIGN KEY (Opponent) REFERENCES teams ("Short Name")
+        )
     ''')
 
-team_db_create()
-player_db_create()
-match_db_create()
-player_total_stats_db_create()
-# player_match_stat_db_create()
+    # Close the connection
+    ipl_db.commit()
+    ipl_cursor.close()
+    ipl_db.close()
+
+
+"""
+Comment out following code to create tables
+"""
+
+# team_db_create()
+# player_db_create()
+# match_db_create()
+# player_total_stats_db_create()
+# player_bat_stat_db_create()
+# player_bowl_stat_db_create()
