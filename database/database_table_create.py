@@ -166,18 +166,18 @@ def match_db_create() -> None:
         Winner TEXT NOT NULL,
         "Man of the match" TEXT NOT NULL,
         "Match time" INTEGER NOT NULL CHECK (Match time IN (0, 1)),
-        Score(i1) TEXT NOT NULL DEFAULT "0/0" CHECK(Score(i1) LIKE "%/%" AND Score(i1) GLOB "[0-9]*/[0-9]*"),
-        Score(i2) TEXT NOT NULL DEFAULT "0/0" CHECK(Score(i2) LIKE "%/%" AND Score(i2) GLOB "[0-9]*/[0-9]*"),
+        Score(i1) TEXT NOT NULL DEFAULT '0/0' CHECK(Score(i1) LIKE '%/%' AND Score(i1) GLOB '[0-9]*/[0-9]*'),
+        Score(i2) TEXT NOT NULL DEFAULT '0/0' CHECK(Score(i2) LIKE '%/%' AND Score(i2) GLOB '[0-9]*/[0-9]*'),
         "High score(i1)" INTEGER NOT NULL,
         "High scorer(i1)" TEXT NOT NULL ,
         "Best bowler(i1)" TEXT NOT NULL,
-        "Best bowling(i1)" TEXT NOT NULL DEFAULT "0/0" CHECK(Best bowling(i1) LIKE "%/%" AND Best bowling(i1) GLOB 
-        "[0-9]*/[0-9]*"),
+        "Best bowling(i1)" TEXT NOT NULL DEFAULT '0/0' CHECK(Best bowling(i1) LIKE '%/%' AND Best bowling(i1) GLOB 
+        '[0-9]*/[0-9]*'),
         "High score(i2)" INTEGER NOT NULL,
         "High scorer(i2)" TEXT NOT NULL ,
         "Best bowler(i2)" TEXT NOT NULL ,
-        "Best bowling(i2)" TEXT NOT NULL DEFAULT "0/0" CHECK(Best bowling(i2) LIKE "%/%" AND Best bowling(i2) GLOB 
-        "[0-9]*/[0-9]*"),
+        "Best bowling(i2)" TEXT NOT NULL DEFAULT '0/0' CHECK(Best bowling(i2) LIKE '%/%' AND Best bowling(i2) GLOB 
+        '[0-9]*/[0-9]*'),
         
 
         FOREIGN KEY ("Home Team") REFERENCES teams ("Short Name"),
@@ -239,6 +239,8 @@ def player_total_stats_db_create() -> None:
     #     The total number of times the player was stumped out
     # Out (bowled) : int
     #     The total number of times the player was bowled out
+    # Out (lbw) : int
+    #     The total number of times the player was out by lbw
     # Catches (field) : int
     #     The total number of catches taken by the player in the field
     # Run outs (field) : int
@@ -257,6 +259,8 @@ def player_total_stats_db_create() -> None:
     #     The total number of wickets taken by the player by hitting the wicket with a ball
     # Wicket-stumped : int
     #     The total number of wickets taken by the player through stump out
+    # Wicket-lbw : int
+    #     The total number of wickets taken by the player through lbw
     # Best Figure : str
     #     The best figure captured by player in single match
     # Five Wickets : int
@@ -280,6 +284,7 @@ def player_total_stats_db_create() -> None:
         "Out (run out)" INTEGER NOT NULL DEFAULT 0,
         "Out (stumped)" INTEGER NOT NULL DEFAULT 0,
         "Out (bowled)" INTEGER NOT NULL DEFAULT 0,
+        "Out (lbw)" INTEGER NOT NULL DEFAULT 0,
         "Catches (field)" INTEGER NOT NULL DEFAULT 0,
         "Run outs (field)" INTEGER NOT NULL DEFAULT 0,
         "Stumping (field)" INTEGER NOT NULL DEFAULT 0,
@@ -289,7 +294,8 @@ def player_total_stats_db_create() -> None:
         "Wicket-catch" INTEGER NOT NULL DEFAULT 0,
         "Wicket-bowled" INTEGER NOT NULL DEFAULT 0,
         "Wicket-stumped" INTEGER NOT NULL DEFAULT 0,
-        "Best Figure" TEXT NOT NULL DEFAULT "0/0" CHECK("Best Figure" LIKE "%/%" AND "Best Figure" GLOB "[0-9]*/[0-9]*")
+        "Wicket-lbw" INTEGER NOT NULL DEFAULT 0,
+        "Best Figure" TEXT NOT NULL DEFAULT "0/0" CHECK("Best Figure" LIKE '%/%' AND "Best Figure" GLOB '[0-9]*/[0-9]*')
         ,
         "Five Wickets" INTEGER NOT NULL DEFAULT 0
         )
@@ -337,8 +343,11 @@ def player_bat_stat_db_create() -> None:
     # Not out : int
     #     Shows weather player was not out while batting in this match. 0 for out and 1 for not out.
     # Out type : str
-    #     Shows how player got out in this match if player batted in this match
-    # Out bowler : str
+    #     Shows how player got out in this match if player batted in this match.
+    #     Options are catch out, lbw, stumped, run out, bowled
+    # Wicket bowling style : str
+    #     Shows if player got out then what was the bowling style if player got out except by run out
+    # Wicket bowler : str
     #     Shows which bowler was responsible if player got out by bowled, stumped or caught. None if player was not out
     #     or got run out
     # Fielder : str
@@ -348,8 +357,8 @@ def player_bat_stat_db_create() -> None:
     #     1 if performance of player received man of the match award
 
     ipl_cursor.execute('''
-    CREATE TABLE IF NOT EXISTS player_stat_individual (
-        "Player ID" INTEGER PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS "Batting Performance" (
+        "Player ID" INTEGER PRIMARY KEY AUTOINCREMENT,
         Name TEXT NOT NULL,
         "Match ID" INTEGER NOT NULL,
         Opponent TEXT NOT NULL,
@@ -357,27 +366,19 @@ def player_bat_stat_db_create() -> None:
         Bowls INTEGER NOT NULL DEFAULT 0,
         4s INTEGER NOT NULL DEFAULT 0,
         6s INTEGER NOT NULL DEFAULT 0,
-        "Not out" INTEGER NOT NULL DEFAULT 0,
-        "Out type" TEXT NOT NULL DEFAULT "None",
-        field_catch INTEGER NOT NULL DEFAULT 0,
-        field_run_out INTEGER NOT NULL DEFAULT 0,
-        field_stumping INTEGER NOT NULL DEFAULT 0,
-        bowling_bowls INTEGER NOT NULL DEFAULT 0,
-        bowling_runs INTEGER NOT NULL DEFAULT 0,
-        bowling_wickets INTEGER NOT NULL DEFAULT 0,
+        "Not out" INTEGER NOT NULL DEFAULT 0 CHECK ("Not out" IN (0, 1)),
+        "Out type" TEXT NOT NULL DEFAULT 'None',
+        "Wicket bowling style" TEXT NOT NULL DEFAULT 'None',
+        "Wicket bowler" TEXT NOT NULL DEFAULT 'None',
+        Fielder TEXT NOT NULL DEFAULT 'None',
         "Man of the match" INTEGER NOT NULL CHECK ("Man of the match" IN (0, 1)),
         
-        FOREIGN KEY (match_id) REFERENCES matches (match_id),
-        FOREIGN KEY (opponent_team) REFERENCES teams (short_name)
+        FOREIGN KEY ("Match ID") REFERENCES matches ("Match ID"),
+        FOREIGN KEY (Opponent) REFERENCES teams ("Short Name"),
+        FOREIGN KEY ("Wicket bowler") REFERENCES players (Name), 
+        FOREIGN KEY (Fielder) REFERENCES players (Name)
         )
     ''')
-
-    # # Copy the name of player from original player database
-    # ipl_cursor.execute('''
-    #     INSERT INTO player_stat (player_id, player_name)
-    #     SELECT player_id, player_name
-    #     FROM players
-    # ''')
 
     ipl_db.commit()
     ipl_cursor.close()
@@ -427,6 +428,8 @@ def player_bowl_stat_db_create() -> None:
     #     The total number of wickets taken by the bowler by hitting the wicket with a ball in this match
     # Wicket-stumped : int
     #     The total number of wickets taken by the bowler through stump out in this match
+    # Wicket-lbw : int
+    #     The total number of wickets taken by bowler through lbw in this match
     # Field-catch : int
     #     The total number of catches taken by the player in the field in this match
     # Field-runout : int
@@ -434,6 +437,32 @@ def player_bowl_stat_db_create() -> None:
     # Field-stumping : int
     #     The total number of times the player has stumped out a batsman in this match
 
+    # Create table
+    ipl_cursor.execute('''
+    CREATE TABLE IF NOT EXISTS "Bowling Performance" (
+        "Player ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+        Name TEXT NOT NULL,
+        "Match ID" INTEGER NOT NULL,
+        Opponent TEXT NOT NULL,
+        Bowls INTEGER NOT NULL DEFAULT 0,
+        "Runs conceded" INTEGER NOT NULL DEFAULT 0,
+        Wickets INTEGER NOT NULL DEFAULT 0,
+        "Maiden over" INTEGER NOT NULL DEFAULT 0,
+        "Dot ball" INTEGER NOT NULL DEFAULT 0,
+        "4s conceded" INTEGER NOT NULL DEFAULT 0,
+        "6s conceded" INTEGER NOT NULL DEFAULT 0,
+        Wides INTEGER NOT NULL DEFAULT 0,
+        "No balls" INTEGER NOT NULL DEFAULT 0,
+        "Wicket-catch" INTEGER NOT NULL DEFAULT 0,
+        "Wicket-bowled" INTEGER NOT NULL DEFAULT 0,
+        "Wicket-stumped" INTEGER NOT NULL DEFAULT 0,
+        "Wicket-lbw" INTEGER NOT NULL DEFAULT 0,
+        "Field-catch" INTEGER NOT NULL DEFAULT 0,
+        "Field-runout" INTEGER NOT NULL DEFAULT 0,
+        "Field-stumping" INTEGER NOT NULL DEFAULT 0
+    
+    
+    ''')
 
 team_db_create()
 player_db_create()
