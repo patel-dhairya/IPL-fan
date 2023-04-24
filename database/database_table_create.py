@@ -212,8 +212,8 @@ def player_total_stats_db_create() -> None:
     # -----------
     # Name : str
     #   The name of the player.
-    # Match Played : int
-    #     The total number of matches played by the player
+    # Match Played (bat): int
+    #     The total number of matches player got opportunity to bat
     # Runs (bat) : int
     #     The total number of runs scored by the player
     # Bowls (bat) : int
@@ -248,6 +248,8 @@ def player_total_stats_db_create() -> None:
     #     The total number of run outs achieved by the player in the field
     # Stumping (field) : int
     #     The total number of times the player has stumped out a batsman in the field
+    # Match Played (bowl) : int
+    #     The total number of matches where player was part of bowling attack
     # Bowls (ball) : int
     #     The total number of balls bowled by the player
     # Runs Conceded : int
@@ -271,7 +273,7 @@ def player_total_stats_db_create() -> None:
     CREATE TABLE IF NOT EXISTS "Player Stats Summary" (
         "Player ID" INTEGER PRIMARY KEY,
         Name TEXT NOT NULL,
-        "Match Played" INTEGER NOT NULL DEFAULT 0,
+        "Match Played (bat)" INTEGER NOT NULL DEFAULT 0,
         "Runs (bat)" INTEGER NOT NULL DEFAULT 0,
         "Bowls (bat)" INTEGER NOT NULL DEFAULT 0,
         "4s" INTEGER NOT NULL DEFAULT 0,
@@ -289,6 +291,7 @@ def player_total_stats_db_create() -> None:
         "Catches (field)" INTEGER NOT NULL DEFAULT 0,
         "Run outs (field)" INTEGER NOT NULL DEFAULT 0,
         "Stumping (field)" INTEGER NOT NULL DEFAULT 0,
+        "Match Played (bowl)" INTEGER NOT NULL DEFAULT 0,
         "Bowls (ball)" INTEGER NOT NULL DEFAULT 0,
         "Runs Conceded" INTEGER NOT NULL DEFAULT 0,
         Wickets INTEGER NOT NULL DEFAULT 0,
@@ -438,6 +441,8 @@ def player_bowl_stat_db_create() -> None:
     #     The total number of run outs player was associated with in this match
     # Field-stumping : int
     #     The total number of times the player has stumped out a batsman in this match
+    # Man of the match : int
+    #     1 if performance of player received man of the match award
 
     # Create table
     ipl_cursor.execute('''
@@ -462,6 +467,7 @@ def player_bowl_stat_db_create() -> None:
         "Field-catch" INTEGER NOT NULL DEFAULT 0,
         "Field-runout" INTEGER NOT NULL DEFAULT 0,
         "Field-stumping" INTEGER NOT NULL DEFAULT 0,
+        "Man of the match" INTEGER NOT NULL CHECK ("Man of the match" IN (0, 1)),
         
         FOREIGN KEY (Name) REFERENCES players (Name), 
         FOREIGN KEY ("Match ID") REFERENCES matches ("Match ID"),
