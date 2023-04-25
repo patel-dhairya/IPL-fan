@@ -75,7 +75,7 @@ def player_db_create() -> None:
     # Batting Hand : str
     #     The batting style of the player (e.g. right-handed, left-handed).
     # Bowling hand : str
-    #     The hand with which the player bowls (e.g. right, left).
+    #     The hand with which the player balls (e.g. right, left).
     # Bowling Style : str
     #     The bowling style of the player (e.g. fast, spin).
     # Team : str
@@ -126,6 +126,8 @@ def match_db_create() -> None:
     #   Home team in the match
     # Away Team : str
     #   Away team in the match
+    # Stadium : str
+    #   Name of stadium where match took place
     # Toss Win : str
     #   Name of team that won toss
     # Field First : int/bool
@@ -140,6 +142,10 @@ def match_db_create() -> None:
     #   Runs scored by team batting first in format of runs/wickets. (Ex. 205/2)
     # Score(i2) : str
     #   Runs scored by team batting second in format of runs/wickets
+    # Powerplay score(i1) : int
+    #   Score of team batting first in first six overs
+    # Powerplay score(i2) : int
+    #   Score of team batting second in first six overs
     # High score(i1) : int
     #   Runs of player who scored the highest run in team batting first
     # High scorer(i1) : str
@@ -162,6 +168,7 @@ def match_db_create() -> None:
         "Match ID" INTEGER PRIMARY KEY,
         "Home Team" TEXT NOT NULL,
         "Away Team" TEXT NOT NULL,
+        Stadium TEXT NOT NULL,
         "Toss Win" TEXT NOT NULL,
         "Field First" INTEGER NOT NULL CHECK ("Field First" IN (0, 1)),
         Winner TEXT NOT NULL,
@@ -169,6 +176,10 @@ def match_db_create() -> None:
         "Match time" INTEGER NOT NULL CHECK ("Match time" IN (0, 1)),
         "Score(i1)" TEXT NOT NULL DEFAULT '0/0' CHECK("Score(i1)" LIKE '%/%' AND "Score(i1)" GLOB '[0-9]*/[0-9]*'),
         "Score(i2)" TEXT NOT NULL DEFAULT '0/0' CHECK("Score(i2)" LIKE '%/%' AND "Score(i2)" GLOB '[0-9]*/[0-9]*'),
+        "Powerplay score(i1)" TEXT NOT NULL DEFAULT '0/0' CHECK("Powerplay score(i1)" LIKE '%/%' AND
+        "Powerplay score(i1)" GLOB '[0-9]*/[0-9]*'),
+        "Powerplay score(i2)" TEXT NOT NULL DEFAULT '0/0' CHECK("Powerplay score(i2)" LIKE '%/%' AND
+        "Powerplay score(i2)" GLOB '[0-9]*/[0-9]*'),
         "High score(i1)" INTEGER NOT NULL,
         "High scorer(i1)" TEXT NOT NULL ,
         "Best bowler(i1)" TEXT NOT NULL,
@@ -216,7 +227,7 @@ def player_total_stats_db_create() -> None:
     #     The total number of matches player got opportunity to bat
     # Runs (bat) : int
     #     The total number of runs scored by the player
-    # Bowls (bat) : int
+    # Balls (bat) : int
     #     The total number of balls faced by the player while batting
     # 4s : int
     #     The total number of 4s scored by the player
@@ -248,9 +259,9 @@ def player_total_stats_db_create() -> None:
     #     The total number of run outs achieved by the player in the field
     # Stumping (field) : int
     #     The total number of times the player has stumped out a batsman in the field
-    # Match Played (bowl) : int
+    # Match Played (ball) : int
     #     The total number of matches where player was part of bowling attack
-    # Bowls (ball) : int
+    # Balls (field) : int
     #     The total number of balls bowled by the player
     # Runs Conceded : int
     #     The total number of runs given by the player while bowling
@@ -275,7 +286,7 @@ def player_total_stats_db_create() -> None:
         Name TEXT NOT NULL,
         "Match Played (bat)" INTEGER NOT NULL DEFAULT 0,
         "Runs (bat)" INTEGER NOT NULL DEFAULT 0,
-        "Bowls (bat)" INTEGER NOT NULL DEFAULT 0,
+        "Balls (bat)" INTEGER NOT NULL DEFAULT 0,
         "4s" INTEGER NOT NULL DEFAULT 0,
         "6s" INTEGER NOT NULL DEFAULT 0,
         "Half Centuries" INTEGER NOT NULL DEFAULT 0,
@@ -291,8 +302,8 @@ def player_total_stats_db_create() -> None:
         "Catches (field)" INTEGER NOT NULL DEFAULT 0,
         "Run outs (field)" INTEGER NOT NULL DEFAULT 0,
         "Stumping (field)" INTEGER NOT NULL DEFAULT 0,
-        "Match Played (bowl)" INTEGER NOT NULL DEFAULT 0,
-        "Bowls (ball)" INTEGER NOT NULL DEFAULT 0,
+        "Match Played (ball)" INTEGER NOT NULL DEFAULT 0,
+        "Balls (field)" INTEGER NOT NULL DEFAULT 0,
         "Runs Conceded" INTEGER NOT NULL DEFAULT 0,
         Wickets INTEGER NOT NULL DEFAULT 0,
         "Wicket-catch" INTEGER NOT NULL DEFAULT 0,
@@ -301,7 +312,7 @@ def player_total_stats_db_create() -> None:
         "Wicket-lbw" INTEGER NOT NULL DEFAULT 0,
         "Best Figure" TEXT NOT NULL DEFAULT "0/0" CHECK("Best Figure" LIKE '%/%' AND "Best Figure" GLOB '[0-9]*/[0-9]*')
         ,
-        "Five Wickets" INTEGER NOT NULL DEFAULT 0
+        "Best Figure" INTEGER NOT NULL DEFAULT 0
         )
     ''')
 
@@ -338,7 +349,7 @@ def player_bat_stat_db_create() -> None:
     #   Opponent team in this match
     # Runs : int
     #     The number of runs scored by the player
-    # Bowls : int
+    # Balls : int
     #     The total number of balls faced by the player in this match
     # 4s : int
     #     The total number of 4s scored by the player in this match
@@ -367,7 +378,7 @@ def player_bat_stat_db_create() -> None:
         "Match ID" INTEGER NOT NULL,
         Opponent TEXT NOT NULL,
         Runs INTEGER NOT NULL DEFAULT 0,
-        Bowls INTEGER NOT NULL DEFAULT 0,
+        Balls INTEGER NOT NULL DEFAULT 0,
         "4s" INTEGER NOT NULL DEFAULT 0,
         "6s" INTEGER NOT NULL DEFAULT 0,
         "Not out" INTEGER NOT NULL DEFAULT 0 CHECK ("Not out" IN (0, 1)),
@@ -409,7 +420,7 @@ def player_bowl_stat_db_create() -> None:
     #   The id of match for player's performance
     # Opponent : str
     #   Opponent team in this match
-    # Bowls : int
+    # Balls : int
     #     The total number of balls bowled by the player in this match
     # Runs conceded : int
     #     The total number of runs given by the player while bowling in this match
@@ -451,7 +462,7 @@ def player_bowl_stat_db_create() -> None:
         Name TEXT NOT NULL,
         "Match ID" INTEGER NOT NULL,
         Opponent TEXT NOT NULL,
-        Bowls INTEGER NOT NULL DEFAULT 0,
+        Balls INTEGER NOT NULL DEFAULT 0,
         "Runs conceded" INTEGER NOT NULL DEFAULT 0,
         Wickets INTEGER NOT NULL DEFAULT 0,
         "Maiden over" INTEGER NOT NULL DEFAULT 0,

@@ -1,5 +1,5 @@
-from add_match import add_match
-from update_stats import update_player_stat
+
+from database_table_add import update_player_stat
 
 """
 match_id, opponent_team, player_name, batting_run=0, batting_bowl=0, batting_4=0, batting_6=0, out_style=None,
