@@ -124,75 +124,73 @@ def add_player_bat_data(player_name: str, match_id: int, opponent_team: str, run
     """
     try:
         # Create a connection to the database
-        ipl_db = sqlite3.connect("ipl.db")
-        ipl_cursor = ipl_db.cursor()
+        with sqlite3.connect("ipl.db") as ipl_db:
+            ipl_cursor = ipl_db.cursor()
 
-        # Shows if player got out then what was the bowling style if player got out except by run out
-        if out_type in ["catch", "stumped", "bowled", "lbw"]:
-            wicket_bowling_style = ipl_cursor.execute('''SELECT "Bowling Type" FROM players WHERE Name = ? ''',
-                                                      player_name)
-        else:
-            wicket_bowling_style = None
+            # Shows if player got out then what was the bowling style if player got out except by run out
+            if out_type in ["catch", "stumped", "bowled", "lbw"]:
+                wicket_bowling_style = ipl_cursor.execute('''SELECT "Bowling Type" FROM players WHERE Name = ?''',
+                                                          (wicket_bowler,)).fetchone()[0]
+            else:
+                wicket_bowling_style = None
 
-        # First, add data to batting performance
-        ipl_cursor.execute('''
-        INSERT INTO "Batting Performance" (
-            Name, "Match ID", Opponent, Runs, Balls, "4s", "6s", "Not out", "Out type", "Wicket bowling style", "Wicket 
-            bowler", Fielder, "Man of the match") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (player_name, match_id, opponent_team, runs, balls, boundaries, sixes, not_out, out_type,
-              wicket_bowling_style, wicket_bowler, fielder, int(motm)))
+            # First, add data to batting performance
+            ipl_cursor.execute('''
+            INSERT INTO "Batting Performance" (
+                Name, "Match ID", Opponent, Runs, Balls, "4s", "6s", "Not out", "Out type", "Wicket bowling style", 
+                "Wicket bowler", Fielder, "Man of the match") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (player_name, match_id, opponent_team, runs, balls, boundaries, sixes, not_out, out_type,
+                  wicket_bowling_style, wicket_bowler, fielder, int(motm)))
 
-        # Now, add data to player overall performance summary table
-        # But before that we need few extra variables to handle cases
-        query = ''' UPDATE "Player Stats Summary"
-            SET "Match Played (bat)" = "Match Played (bat)" + 1, "Runs (bat)" = "Runs (bat)" + ?, "Balls (bat)" = 
-            "Balls (bat)" + ?, "4s" = "4s" + ?, "6s" = "6s" + ?, "Half Centuries" = "Half Centuries" + ?, "Centuries" = 
-            "Centuries" + ?, "Duck outs" = "Duck outs" + ?, "Highest Score" = ?, NO = NO + ?, "Out (catch)" = 
-            "Out (catch)" + ?, "Out (run out)" = "Out (run out)" + ?, "Out (stumped)" = "Out (stumped)" + ?, 
-            "Out (bowled)" = "Out (bowled)" + ?, "Out (lbw)" = "Out (lbw)" + ?
-            WHERE player_name = ? LIMIT 1;"
-        '''
+            # Now, add data to player overall performance summary table
+            # But before that we need few extra variables to handle cases
+            query = '''UPDATE "Player Stats Summary" SET "Match Played (bat)" = "Match Played (bat)" + 1, 
+            "Runs (bat)" = "Runs (bat)" + ?, "Balls (bat)" = "Balls (bat)" + ?, "4s" = "4s" + ?, "6s" = "6s" + ?, 
+            "Half Centuries" = "Half Centuries" + ?, "Centuries" = "Centuries" + ?, "Duck outs" = "Duck outs" + ?, 
+            "Highest Score" = ?, NO = NO + ?, "Out (catch)" = "Out (catch)" + ?, "Out (run out)" = "Out (run out)" + 
+            ?, "Out (stumped)" = "Out (stumped)" + ?, "Out (bowled)" = "Out (bowled)" + ?, "Out (lbw)" = "Out (lbw)" 
+            + ? WHERE Name = ?'''
 
-        # Extra variables for query for Player Stats summary
-        # Check if player hit half-century(50 runs) or century(100 runs)
-        century = True if runs >= 100 else False
-        half_century = True if 50 <= runs < 100 else False
+            # Extra variables for query for Player Stats summary
+            # Check if player hit half-century(50 runs) or century(100 runs)
+            century = True if runs >= 100 else False
+            half_century = True if 50 <= runs < 100 else False
 
-        # Check if player is duck out/got out on 0
-        duck_out = True if runs == 0 else False
+            # Check if player is duck out/got out on 0
+            duck_out = True if runs == 0 else False
 
-        # Check if new score of player is higher than previous highest score
-        current_high_score = ipl_cursor.execute('SELECT "Highest Score" FROM "Player Stats Summary" WHERE name = ?',
-                                                player_name).fetchone()
-        new_high_score = max(runs, current_high_score)
+            # Check if new score of player is higher than previous highest score
+            current_high_score = int(ipl_cursor.execute('SELECT "Highest Score" FROM "Player Stats Summary" WHERE '
+                                                        'name = ?', (player_name,)).fetchone()[0])
+            new_high_score = max(runs, current_high_score)
 
-        # Type of how player got out
-        # I am assuming that input provided by user is correct as currently I am the only one providing input
-        out_catch = 1 if out_type == "catch" else 0
-        out_run_out = 1 if out_type == "run-out" else 0
-        out_stumped = 1 if out_type == "stumped" else 0
-        out_bowled = 1 if out_type == "bowled" else 0
-        out_lbw = 1 if out_type == "lbw" else 0
+            # Type of how player got out
+            # I am assuming that input provided by user is correct as currently I am the only one providing input
+            out_catch = 1 if out_type == "catch" else 0
+            out_run_out = 1 if out_type == "run-out" else 0
+            out_stumped = 1 if out_type == "stumped" else 0
+            out_bowled = 1 if out_type == "bowled" else 0
+            out_lbw = 1 if out_type == "lbw" else 0
 
-        ipl_cursor.execute(query, (runs, balls, boundaries, sixes, half_century, century, duck_out,
-                                   new_high_score, int(not_out), out_catch, out_run_out, out_stumped, out_bowled,
-                                   out_lbw, player_name))
+            ipl_cursor.execute(query, (runs, balls, boundaries, sixes, half_century, century, duck_out,
+                                       new_high_score, int(not_out), out_catch, out_run_out, out_stumped, out_bowled,
+                                       out_lbw, player_name))
 
-        # Close the connection
-        ipl_db.commit()
-        ipl_cursor.close()
-        ipl_db.close()
+            # Close the connection
+            ipl_db.commit()
+            ipl_cursor.close()
         return f"Batting data added successfully for {player_name}, {match_id}"
 
     except Exception as e:
+        print("Batting Error", e)
         return f"Error: {str(e)}"
 
 
-def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, balls: int, runs_conceded: int,
-                         wickets: int, maiden_overs: int, dot_balls: int, boundaries_conceded: int,
-                         six_conceded: int, wides: int, no_balls: int, wickets_catch: int, wickets_bowled: int,
-                         wickets_stumped: int, wickets_lbw: int, field_catch: int, field_runout: int,
-                         field_stumping: int, motm: bool) -> str:
+def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, balls: int = 0, runs_conceded: int = 0,
+                         wickets: int = 0, maiden_overs: int = 0, dot_balls: int = 0, boundaries_conceded: int = 0,
+                         six_conceded: int = 0, wides: int = 0, no_balls: int = 0, wickets_catch: int = 0,
+                         wickets_bowled: int = 0, wickets_stumped: int = 0, wickets_lbw: int = 0, field_catch: int = 0,
+                         field_runout: int = 0, field_stumping: int = 0, motm: bool = False) -> str:
     """
     Add player bowling/fielding performance to two tables - Bowling Performance and Player Stats Summary
     Bowling performance stores player performance against each opponent and can be seen with help of player name,
@@ -226,66 +224,75 @@ def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, ba
     """
     try:
         # Create a connection to the database
-        ipl_db = sqlite3.connect("ipl.db")
-        ipl_cursor = ipl_db.cursor()
+        with sqlite3.connect("ipl.db") as ipl_db:
+            ipl_cursor = ipl_db.cursor()
 
-        # First, add data to bowling performance
-        ipl_cursor.execute('''
-        INSERT INTO "Batting Performance" (
-            Name, "Match ID", Opponent,  balls, "Runs conceded", Wickets, "Maiden over", "Dot ball", "4s conceded", 
-            "6s conceded", Wides, "No balls", "Wicket-catch", "Wicket-bowled", "Wicket-stumped", "Wicket-lbw", 
-            "Field-catch", "Field-runout", "Field-stumping", "Man of the match") 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (player_name, match_id, opponent_team, balls, runs_conceded, wickets, maiden_overs, dot_balls,
-              boundaries_conceded, six_conceded, wides, no_balls, wickets_catch, wickets_bowled, wickets_stumped,
-              wickets_lbw, field_catch, field_runout, field_stumping, motm))
+            # First, add data to bowling performance
+            ipl_cursor.execute('''
+            INSERT INTO "Bowling Performance" (
+                Name, "Match ID", Opponent,  balls, "Runs conceded", Wickets, "Maiden over", "Dot ball", "4s conceded", 
+                "6s conceded", Wides, "No balls", "Wicket-catch", "Wicket-bowled", "Wicket-stumped", "Wicket-lbw", 
+                "Field-catch", "Field-runout", "Field-stumping", "Man of the match") 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (player_name, match_id, opponent_team, balls, runs_conceded, wickets, maiden_overs, dot_balls,
+                  boundaries_conceded, six_conceded, wides, no_balls, wickets_catch, wickets_bowled, wickets_stumped,
+                  wickets_lbw, field_catch, field_runout, field_stumping, motm))
 
-        # Now, add data to player overall performance summary table
+            # Now, add data to player overall performance summary table
 
-        query = '''
-        UPDATE "Player Stats Summary" SET "Match Played (ball)" = "Match Played (ball)" + 1, 
-        "Balls (field)" = "Balls (field)" + ?, "Runs Conceded" = "Runs Conceded" + ?, Wickets = Wickets + ?, 
-        "Wicket-catch" = "Wicket-catch" + ?, "Wicket-bowled" = "Wicket-bowled" + ?, "Wicket-stumped" = 
-        "Wicket-stumped" + ?, "Wicket-lbw" ="Wicket-lbw" + ?, "Best Figure" = ?, "Best Figure" = "Best Figure" + ? 
-        WHERE player_name = ? LIMIT 1;
-        '''
+            query = '''
+            UPDATE "Player Stats Summary"
+            SET "Balls (field)" = "Balls (field)" + ?, "Runs Conceded" = "Runs Conceded" + ?, Wickets = Wickets + ?, 
+            "Wicket-catch" = "Wicket-catch" + ?, "Wicket-bowled" = "Wicket-bowled" + ?, "Wicket-stumped" = 
+            "Wicket-stumped" + ?, "Wicket-lbw" ="Wicket-lbw" + ?, "Best Figure" = ?, "Best Figure" = "Best Figure" + ? 
+            WHERE "Name" = ?
+            '''
 
-        # But before that we need few extra variables to handle cases
-        # Extra variables for query for Player Stats summary
-        # Check if player hit half-century(50 runs) or century(100 runs)
+            # But before that we need few extra variables to handle cases
+            # Extra variables for query for Player Stats summary
+            # Check if player hit half-century(50 runs) or century(100 runs)
 
-        # Check if current bowling figure is best bowling figure of bowler
-        current_best_bowling_figure = ipl_cursor.execute('''SELECT "Best Figure" FROM player_stat WHERE name = ?''',
-                                                         (player_name,)).fetchone()[0]
-        best_figure_run, best_figure_wicket = list(map(int, current_best_bowling_figure.split("/")))
+            # Check if current bowling figure is best bowling figure of bowler
+            current_best_bowling_figure = ipl_cursor.execute('''SELECT "Best Figure" FROM "Player Stats Summary" WHERE 
+            name = ?''', (player_name,)).fetchone()[0]
+            best_figure_run, best_figure_wicket = list(map(int, current_best_bowling_figure.split("/")))
 
-        # Player has never taken wicket in tournament
-        if best_figure_wicket == 0 and best_figure_run == 0:
-            new_best_bowling_figure = f"{runs_conceded}/{wickets}"
+            # Player has never taken wicket in tournament
+            if best_figure_wicket == 0 and best_figure_run == 0:
+                new_best_bowling_figure = f"{runs_conceded}/{wickets}"
 
-        # Player has taken equal wicket to best bowling figure until now
-        elif wickets == best_figure_wicket:
-            new_best_bowling_figure = f"{min(runs_conceded, best_figure_run)}/{wickets}"
-        # Player has taken more wicket than best bowling figure until this match
-        elif wickets > best_figure_wicket:
-            new_best_bowling_figure = f"{runs_conceded}/{wickets}"
-        # Wicket taken by player in this match is less than best bowling figure wicket
-        else:
-            new_best_bowling_figure = current_best_bowling_figure
+            # Player has taken equal wicket to best bowling figure until now
+            elif wickets == best_figure_wicket:
+                new_best_bowling_figure = f"{min(runs_conceded, best_figure_run)}/{wickets}"
+            # Player has taken more wicket than best bowling figure until this match
+            elif wickets > best_figure_wicket:
+                new_best_bowling_figure = f"{runs_conceded}/{wickets}"
+            # Wicket taken by player in this match is less than best bowling figure wicket
+            else:
+                new_best_bowling_figure = current_best_bowling_figure
 
-        # Check if bowler got more than or equal to 5 wickets
-        five_wickets = 1 if wickets >= 5 else 0
+            # print(new_best_bowling_figure)
+            # Check if bowler got more than or equal to 5 wickets
+            five_wickets = 1 if wickets >= 5 else 0
 
-        ipl_cursor.execute(query, (balls, runs_conceded, wickets, wickets_catch, wickets_bowled, wickets_stumped,
-                                   wickets_lbw, new_best_bowling_figure, five_wickets, player_name))
+            ipl_cursor.execute(query, (balls, runs_conceded, wickets, wickets_catch, wickets_bowled, wickets_stumped,
+                                       wickets_lbw, new_best_bowling_figure, five_wickets, player_name))
 
-        # Close the connection
-        ipl_db.commit()
-        ipl_cursor.close()
-        ipl_db.close()
+            # Now, if player was included in bowling attack, increase the number of matches played bowled by 1
+            if balls > 0:
+                query = '''UPDATE "Player Stats Summary"
+                SET "Match Played (ball)" = "Match Played (ball)" + 1
+                WHERE Name = ?
+                '''
+                ipl_cursor.execute(query, (player_name, ))
+
+            # Close the connection
+            ipl_db.commit()
+            ipl_cursor.close()
         return f"Fielding data added successfully for {player_name}, {match_id}"
 
     except Exception as e:
+        print("Bowling Error", e)
         return f"Error: {str(e)}"
 
 
@@ -325,27 +332,29 @@ def add_match(match_id: int, home_team: str, away_team: str, stadium: str, toss_
 
     try:
         # Create connection
-        ipl_db = sqlite3.connect("ipl.db")
-        ipl_cursor = ipl_db.cursor()
+        with sqlite3.connect("ipl.db") as ipl_db:
+            ipl_cursor = ipl_db.cursor()
 
-        # Create and insert a new match
-        insert_statement = "INSERT INTO matches VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        ipl_cursor.execute(insert_statement, (match_id, home_team, away_team, stadium, toss_win,
-                                              int(toss_win_field_first), winner, man_of_the_match, int(night_match),
-                                              score_inning1, score_inning2, pp_score1, pp_score2, inning1_highest_score,
-                                              inning1_highest_scorer, inning1_best_bowler, inning1_best_bowling,
-                                              inning2_highest_score, inning2_highest_scorer, inning2_best_bowler,
-                                              inning2_best_bowling
-                                              ))
-        # Close the connection
-        ipl_db.commit()
-        ipl_cursor.close()
-        ipl_db.close()
+            # Create and insert a new match
+            insert_statement = "INSERT INTO matches VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?, " \
+                               "? )"
+            ipl_cursor.execute(insert_statement, (match_id, home_team, away_team, stadium, toss_win,
+                                                  int(toss_win_field_first), winner, man_of_the_match, int(night_match),
+                                                  score_inning1, score_inning2, pp_score1, pp_score2, inning1_highest_score,
+                                                  inning1_highest_scorer, inning1_best_bowler, inning1_best_bowling,
+                                                  inning2_highest_score, inning2_highest_scorer, inning2_best_bowler,
+                                                  inning2_best_bowling
+                                                  ))
+            # Close the connection
+            ipl_db.commit()
+            ipl_cursor.close()
+        print("Done")
         return f"Match-{match_id}) {home_team} vs {away_team} added successfully."
 
     except sqlite3.IntegrityError:
-        print(f"Match-{match_id} already exist in database")
+        print("Integrity Error, Match already exist")
         return f"Match-{match_id} already exist in database"
 
     except Exception as e:
+        print(e)
         return f"{e}"

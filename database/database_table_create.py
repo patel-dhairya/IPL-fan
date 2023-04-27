@@ -310,9 +310,7 @@ def player_total_stats_db_create() -> None:
         "Wicket-bowled" INTEGER NOT NULL DEFAULT 0,
         "Wicket-stumped" INTEGER NOT NULL DEFAULT 0,
         "Wicket-lbw" INTEGER NOT NULL DEFAULT 0,
-        "Best Figure" TEXT NOT NULL DEFAULT "0/0" CHECK("Best Figure" LIKE '%/%' AND "Best Figure" GLOB '[0-9]*/[0-9]*')
-        ,
-        "Best Figure" INTEGER NOT NULL DEFAULT 0
+        "Best Figure" TEXT NOT NULL DEFAULT '0/0'
         )
     ''')
 
@@ -382,10 +380,10 @@ def player_bat_stat_db_create() -> None:
         "4s" INTEGER NOT NULL DEFAULT 0,
         "6s" INTEGER NOT NULL DEFAULT 0,
         "Not out" INTEGER NOT NULL DEFAULT 0 CHECK ("Not out" IN (0, 1)),
-        "Out type" TEXT NOT NULL DEFAULT 'None',
-        "Wicket bowling style" TEXT NOT NULL DEFAULT 'None',
-        "Wicket bowler" TEXT NOT NULL DEFAULT 'None',
-        Fielder TEXT NOT NULL DEFAULT 'None',
+        "Out type" TEXT DEFAULT 'None',
+        "Wicket bowling style" TEXT DEFAULT 'None',
+        "Wicket bowler" TEXT DEFAULT 'None',
+        Fielder TEXT DEFAULT 'None',
         "Man of the match" INTEGER NOT NULL CHECK ("Man of the match" IN (0, 1)),
         
         FOREIGN KEY (Name) REFERENCES players (Name), 
@@ -404,7 +402,7 @@ def player_bat_stat_db_create() -> None:
 def player_bowl_stat_db_create() -> None:
     """
         Create a table of statistics of players in ipl database
-        This table will show player's individual performance/stat regarding bowling/fielding against each opponent
+        This table will show player's individual performance/stat regarding bowling against each opponent
         :return: None
         """
 
@@ -496,9 +494,9 @@ def player_bowl_stat_db_create() -> None:
 Comment out following code to create tables
 """
 
-# team_db_create()
-# player_db_create()
-# match_db_create()
-# player_total_stats_db_create()
-# player_bat_stat_db_create()
-# player_bowl_stat_db_create()
+team_db_create()
+player_db_create()
+match_db_create()
+player_total_stats_db_create()
+player_bat_stat_db_create()
+player_bowl_stat_db_create()
