@@ -25,7 +25,7 @@ def match1() -> str:
     add_player_bat_data("Ravindra Jadeja", 1, "GT", 1, 2, 0, 0, False, "catch", "Alzarri Joseph", "Vijay Shankar", False
                         )
     add_player_bat_data("MS Dhoni", 1, "GT", 14, 7, 1, 1, True, "None", "None", "None", motm=False)
-    add_player_bat_data("Mitchell Santner ", 1, "GT", 1, 3, 0, 0, True, "None", "None", "None", motm=False)
+    add_player_bat_data("Mitchell Santner", 1, "GT", 1, 3, 0, 0, True, "None", "None", "None", motm=False)
 
     # GT Field
     add_player_bowl_data("Mohammed Shami", 1, "CSK", 24, 29, 2, 0, 13, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0, 0, False)
@@ -37,6 +37,30 @@ def match1() -> str:
     add_player_bowl_data("Shubman Gill", 1, "CSK", field_catch=1)
     add_player_bowl_data("Wriddhiman Saha", 1, "CSK", field_catch=2)
     add_player_bowl_data("Vijay Shankar", 1, "CSK", field_catch=1)
+
+    # Inning-1 => GT BAT and CSK Field
+    # GT BAT
+    add_player_bat_data("Wriddhiman Saha", 1, "CSK", 25, 16, 2, 2, False, "catch", "Rajvardhan Hangargekar",
+                        "Shivam Dube", False)
+    add_player_bat_data("Shubman Gill", 1, "CSK", 63, 36, 6, 3, False, "catch", "Tushar Deshpande", "Ruturaj Gaikwad",
+                        False)
+    add_player_bat_data("Sai Sudharsan", 1, "CSK", 22, 17, 3, 0, False, "catch", "Rajvardhan Hangargekar", "MS Dhoni",
+                        False)
+    add_player_bat_data("Hardik Pandya", 1, "CSK", 8, 11, 0, 0, False, "bowled", "Ravindra Jadeja", "None", False)
+    add_player_bat_data("Vijay Shankar", 1, "CSK", 27, 21, 2, 1, False, "catch", "Rajvardhan Hangargekar",
+                        "Mitchell Santner")
+    add_player_bat_data("Rahul Tewatia", 1, "CSK", 15, 14, 1, 1, True, "None")
+    add_player_bat_data("Rashid Khan", 1, "CSK", 10, 3, 1, 1, True, "None", motm=True)
+
+    # CSK Field
+    add_player_bowl_data("Deepak Chahar", 1, "GT", 24, 29, 0, 0, 9, 1, 2)
+    add_player_bowl_data("Tushar Deshpande", 1, "GT", 20, 51, 1, 0, 5, 4, 1, 1, 1, 1)
+    add_player_bowl_data("Rajvardhan Hangargekar", 1, "GT", 24, 36, 3, 0, 10, 4, 1, 3, 1, 3)
+    add_player_bowl_data("Mitchell Santner", 1, "GT", 24, 32, 0, 0, 7, 5, field_catch=1)
+    add_player_bowl_data("Ravindra Jadeja", 1, "GT", 24, 28, 1, 0, 9, 1, 1, 0, 0, 0, 1)
+    add_player_bowl_data("Shivam Dube", 1, "GT", field_catch=1)
+    add_player_bowl_data("Ruturaj Gaikwad", 1, "GT", field_catch=1)
+    add_player_bowl_data("MS Dhoni", 1, "GT", field_catch=1)
 
     return "Data added successfully for match-1"
 

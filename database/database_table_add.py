@@ -95,8 +95,8 @@ import sqlite3
 #
 
 def add_player_bat_data(player_name: str, match_id: int, opponent_team: str, runs: int, balls: int, boundaries: int,
-                        sixes: int, not_out: bool, out_type: str = None,
-                        wicket_bowler: str = None, fielder: str = None, motm: bool = False) -> str:
+                        sixes: int, not_out: bool, out_type: str = "None",
+                        wicket_bowler: str = "None", fielder: str = "None", motm: bool = False) -> str:
     """
     Add player batting performance to two tables - Batting Performance and Player Stats Summary
     Batting performance stores player performance against each opponent and can be seen with help of player name,
@@ -127,12 +127,19 @@ def add_player_bat_data(player_name: str, match_id: int, opponent_team: str, run
         with sqlite3.connect("ipl.db") as ipl_db:
             ipl_cursor = ipl_db.cursor()
 
+            # First, let us check if batting performance of player for particular match is already added or not
+            already_exist_entry = ipl_cursor.execute('''
+                        SELECT * FROM "Batting Performance" WHERE Name = ? AND "Match ID" = ?
+                        ''', (player_name, match_id)).fetchone()
+            if already_exist_entry:
+                return f"Data already added for {player_name} and {match_id}"
+
             # Shows if player got out then what was the bowling style if player got out except by run out
             if out_type in ["catch", "stumped", "bowled", "lbw"]:
                 wicket_bowling_style = ipl_cursor.execute('''SELECT "Bowling Type" FROM players WHERE Name = ?''',
                                                           (wicket_bowler,)).fetchone()[0]
             else:
-                wicket_bowling_style = None
+                wicket_bowling_style = "None"
 
             # First, add data to batting performance
             ipl_cursor.execute('''
@@ -227,7 +234,14 @@ def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, ba
         with sqlite3.connect("ipl.db") as ipl_db:
             ipl_cursor = ipl_db.cursor()
 
-            # First, add data to bowling performance
+            # First, let us check if bowling performance of player for particular match is already added or not
+            already_exist_entry = ipl_cursor.execute('''
+            SELECT * FROM "Bowling Performance" WHERE Name = ? AND "Match ID" = ?
+            ''', (player_name, match_id)).fetchone()
+            if already_exist_entry:
+                return f"Data already added for {player_name} and {match_id}"
+
+            # Now, add data to bowling performance
             ipl_cursor.execute('''
             INSERT INTO "Bowling Performance" (
                 Name, "Match ID", Opponent,  balls, "Runs conceded", Wickets, "Maiden over", "Dot ball", "4s conceded", 
@@ -242,7 +256,9 @@ def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, ba
 
             query = '''
             UPDATE "Player Stats Summary"
-            SET "Balls (field)" = "Balls (field)" + ?, "Runs Conceded" = "Runs Conceded" + ?, Wickets = Wickets + ?, 
+            SET "Catches (field)" = "Catches (field)" + ?, "Run outs (field)" = "Run outs (field)" + ?, 
+            "Stumping (field)" = "Stumping (field)" + ?,"Balls (field)" = "Balls (field)" + ?, 
+            "Runs Conceded" = "Runs Conceded" + ?, Wickets = Wickets + ?, 
             "Wicket-catch" = "Wicket-catch" + ?, "Wicket-bowled" = "Wicket-bowled" + ?, "Wicket-stumped" = 
             "Wicket-stumped" + ?, "Wicket-lbw" ="Wicket-lbw" + ?, "Best Figure" = ?, "Best Figure" = "Best Figure" + ? 
             WHERE "Name" = ?
@@ -275,8 +291,9 @@ def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, ba
             # Check if bowler got more than or equal to 5 wickets
             five_wickets = 1 if wickets >= 5 else 0
 
-            ipl_cursor.execute(query, (balls, runs_conceded, wickets, wickets_catch, wickets_bowled, wickets_stumped,
-                                       wickets_lbw, new_best_bowling_figure, five_wickets, player_name))
+            ipl_cursor.execute(query, (field_catch, field_runout, field_stumping, balls, runs_conceded, wickets,
+                                       wickets_catch, wickets_bowled, wickets_stumped, wickets_lbw,
+                                       new_best_bowling_figure, five_wickets, player_name))
 
             # Now, if player was included in bowling attack, increase the number of matches played bowled by 1
             if balls > 0:
@@ -284,7 +301,7 @@ def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, ba
                 SET "Match Played (ball)" = "Match Played (ball)" + 1
                 WHERE Name = ?
                 '''
-                ipl_cursor.execute(query, (player_name, ))
+                ipl_cursor.execute(query, (player_name,))
 
             # Close the connection
             ipl_db.commit()
@@ -340,7 +357,8 @@ def add_match(match_id: int, home_team: str, away_team: str, stadium: str, toss_
                                "? )"
             ipl_cursor.execute(insert_statement, (match_id, home_team, away_team, stadium, toss_win,
                                                   int(toss_win_field_first), winner, man_of_the_match, int(night_match),
-                                                  score_inning1, score_inning2, pp_score1, pp_score2, inning1_highest_score,
+                                                  score_inning1, score_inning2, pp_score1, pp_score2,
+                                                  inning1_highest_score,
                                                   inning1_highest_scorer, inning1_best_bowler, inning1_best_bowling,
                                                   inning2_highest_score, inning2_highest_scorer, inning2_best_bowler,
                                                   inning2_best_bowling
