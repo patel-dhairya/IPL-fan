@@ -64,5 +64,5 @@ def match1() -> str:
 
     return "Data added successfully for match-1"
 
-
-print(match1())
+# Already added
+# print(match1())

@@ -1,3 +1,12 @@
+"""
+This script creates sqlite3 database called ipl to store data.
+
+Author: Dhairya Patel,
+Create Date: Unknown,
+Update Date: May 16, 2023
+"""
+
+
 import csv
 import sys
 import os
@@ -68,10 +77,14 @@ def player_db_create() -> None:
     # -----------
     # Name : str
     #     The name of the player.
-    # Age : int
-    #     The age of the player.
-    # Position : str
-    #     The role of the player in the team (e.g. batsman, bowler, all-rounder).
+    # Full Name : str
+    #     Full name of player
+    # Age : str
+    #     The age of the player when the data on player was last update on website
+    # General Role : str
+    #     The general role of the player in the team (e.g. batsman, bowler, all-rounder).
+    # Specific Role : str
+    #     The specialized role of the player if exist such as top order batter or batting all-rounder
     # Batting Hand : str
     #     The batting style of the player (e.g. right-handed, left-handed).
     # Bowling hand : str
@@ -86,8 +99,11 @@ def player_db_create() -> None:
      CREATE TABLE IF NOT EXISTS players (
          "Player ID" INTEGER PRIMARY KEY AUTOINCREMENT,
          Name TEXT NOT NULL,
-         Age INTEGER NOT NULL,
-         Position TEXT NOT NULL,
+         "Full Name" TEXT NOT NULL,
+         Age TEXT CHECK(Age LIKE '%y %d' AND CAST(SUBSTR(Age, INSTR(Age, ' ') + 1, LENGTH(Age) - INSTR(Age, ' ')) AS 
+         INTEGER) BETWEEN 1 AND 364),
+         "General Role" TEXT NOT NULL,
+         "Specific Role" TEXT NOT NULL,
          "Batting Hand" TEXT NOT NULL,
          "Bowling Hand" TEXT NOT NULL,
          "Bowling Type" TEXT NOT NULL,
@@ -98,12 +114,44 @@ def player_db_create() -> None:
     ''')
 
     # Convert player-data in csv file to sql query format and add it to players table
-    with open("player-data.csv", "r") as file:
+    with open("player_data.csv", "r") as file:
         csv_data = csv.reader(file)
         next(csv_data)  # Skip header
+
+        # Modify some data of csv file to add it to sql database
         for row in csv_data:
-            ipl_cursor.execute("INSERT INTO players (Name, Age, Position, \"Batting Hand\", \"Bowling Hand\", "
-                               "\"Bowling Type\", Team, \"Home Country\") VALUES (?, ?, ?, ?, ?, ?, ?, ?)", row[:-1])
+            name, full_name, age, batting_style, bowling_style, role, country, team = row
+            batting_hand = "Right" if "right" in batting_style.lower() else "Left"
+
+            # I would like one column which suggest one general role between bowler, batsman, all-rounder and
+            # wicketkeeper rather than specific role such as batting all-rounder or top order batter
+            if "batter" in role.lower():
+                if "wicketkeeper" in role.lower():
+                    general_role = "Wicketkeeper"
+                else:
+                    general_role = "Batter"
+            elif "allrounder" in role.lower():
+                general_role = "Allrounder"
+            else:
+                general_role = "Bowler"
+
+            # I would also like a specific column which gives information about bowling hand of bowler if player
+            # has ever bowled
+            # General cricket fact - Leg-break bowlers are generally right arm wrist spinner
+            if "left" in bowling_style.lower():
+                bowling_hand = "Left"
+            elif "right" in bowling_style.lower() or "legbreak" in bowling_style.lower():
+                bowling_hand = "Right"
+            else:
+                bowling_hand = "None"
+
+            add_query = '''
+            INSERT INTO players (Name, "Full Name", Age, "General Role", "Specific Role", "Batting Hand", "Bowling Hand"
+            , "Bowling Type", Team, "Home Country") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            '''
+
+            ipl_cursor.execute(add_query, (name, full_name, age, general_role, role, batting_hand, bowling_hand,
+                                           bowling_style, team, country))
 
     ipl_db.commit()
     ipl_cursor.close()

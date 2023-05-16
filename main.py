@@ -4,7 +4,7 @@ from scipy.stats import chi2_contingency
 
 """Comment out following lines only if you want to create a new database
 You will need to understand how web scrapping work if you want to customise data from website.
-Please look at script.py file in scrapper directory if you want to change how to scrap data.
+Please look at player_background_scrap.py file in scrapper directory if you want to change how to scrap data.
 """
 # from database import player_csv_create
 # player_csv_create.csv_write()
