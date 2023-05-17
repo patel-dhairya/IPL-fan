@@ -1,4 +1,5 @@
 from database_table_add import add_match, add_player_bat_data, add_player_bowl_data
+from scrapper.player_match_performance_scrap import get_info
 
 
 # Match-1
@@ -64,5 +65,11 @@ def match1() -> str:
 
     return "Data added successfully for match-1"
 
+
 # Already added
 # print(match1())
+test_url = "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/punjab-kings-vs-kolkata-knight" \
+           "-riders-2nd-match-1359476/full-scorecard"
+bat, bowl = get_info(test_url)
+print(bat)
+print(bowl)

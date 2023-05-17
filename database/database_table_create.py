@@ -447,7 +447,7 @@ def player_bat_stat_db_create() -> None:
     ipl_db.close()
 
 
-def player_bowl_stat_db_create() -> None:
+def player_ball_stat_db_create() -> None:
     """
         Create a table of statistics of players in ipl database
         This table will show player's individual performance/stat regarding bowling against each opponent
@@ -492,12 +492,6 @@ def player_bowl_stat_db_create() -> None:
     #     The total number of wickets taken by the bowler through stump out in this match
     # Wicket-lbw : int
     #     The total number of wickets taken by bowler through lbw in this match
-    # Field-catch : int
-    #     The total number of catches taken by the player in the field in this match
-    # Field-runout : int
-    #     The total number of run outs player was associated with in this match
-    # Field-stumping : int
-    #     The total number of times the player has stumped out a batsman in this match
     # Man of the match : int
     #     1 if performance of player received man of the match award
 
@@ -521,11 +515,59 @@ def player_bowl_stat_db_create() -> None:
         "Wicket-bowled" INTEGER NOT NULL DEFAULT 0,
         "Wicket-stumped" INTEGER NOT NULL DEFAULT 0,
         "Wicket-lbw" INTEGER NOT NULL DEFAULT 0,
+        "Man of the match" INTEGER NOT NULL CHECK ("Man of the match" IN (0, 1)),
+        
+        FOREIGN KEY (Name) REFERENCES players (Name), 
+        FOREIGN KEY ("Match ID") REFERENCES matches ("Match ID"),
+        FOREIGN KEY (Opponent) REFERENCES teams ("Short Name")
+        )
+    ''')
+
+    # Close the connection
+    ipl_db.commit()
+    ipl_cursor.close()
+    ipl_db.close()
+
+
+def player_field_stat_db_create() -> None:
+    """
+        Create a table of statistics of players in ipl database
+        This table will show player's individual performance/stat regarding fielding against each opponent
+        :return: None
+        """
+
+    # Create a connection to the database
+    ipl_db = sqlite3.connect("ipl.db")
+    ipl_cursor = ipl_db.cursor()
+
+    # Rows information
+    # -----------
+    # Name : str
+    #   The name of the player.
+    # Match ID : int
+    #   The id of match for player's performance
+    # Opponent : str
+    #   Opponent team in this match
+    # Field-catch : int
+    #     The total number of catches taken by the player in the field in this match
+    # Field-runout : int
+    #     The total number of run outs player was associated with in this match
+    # Field-stumping : int
+    #     The total number of times the player has stumped out a batsman in this match
+    # Man of the match : int
+    #     1 if performance of player received man of the match award
+
+    # Create table
+    ipl_cursor.execute('''
+    CREATE TABLE IF NOT EXISTS "Fielding Performance" (
+        "Player ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+        Name TEXT NOT NULL,
+        "Match ID" INTEGER NOT NULL,
+        Opponent TEXT NOT NULL,
         "Field-catch" INTEGER NOT NULL DEFAULT 0,
         "Field-runout" INTEGER NOT NULL DEFAULT 0,
         "Field-stumping" INTEGER NOT NULL DEFAULT 0,
-        "Man of the match" INTEGER NOT NULL CHECK ("Man of the match" IN (0, 1)),
-        
+
         FOREIGN KEY (Name) REFERENCES players (Name), 
         FOREIGN KEY ("Match ID") REFERENCES matches ("Match ID"),
         FOREIGN KEY (Opponent) REFERENCES teams ("Short Name")
@@ -547,4 +589,5 @@ player_db_create()
 match_db_create()
 player_total_stats_db_create()
 player_bat_stat_db_create()
-player_bowl_stat_db_create()
+player_ball_stat_db_create()
+player_field_stat_db_create()

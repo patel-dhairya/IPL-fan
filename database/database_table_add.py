@@ -1,5 +1,6 @@
 import sqlite3
 
+
 def add_player_bat_data(player_name: str, match_id: int, opponent_team: str, runs: int, balls: int, boundaries: int,
                         sixes: int, not_out: bool, out_type: str = "None",
                         wicket_bowler: str = "None", fielder: str = "None", motm: bool = False) -> str:
@@ -98,6 +99,125 @@ def add_player_bat_data(player_name: str, match_id: int, opponent_team: str, run
         print("Batting Error", e)
         return f"Error: {str(e)}"
 
+
+def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, balls: int = 0, runs_conceded: int = 0,
+                         wickets: int = 0, maiden_overs: int = 0, dot_balls: int = 0, boundaries_conceded: int = 0,
+                         six_conceded: int = 0, wides: int = 0, no_balls: int = 0, wickets_catch: int = 0,
+                         wickets_bowled: int = 0, wickets_stumped: int = 0, wickets_lbw: int = 0, field_catch: int = 0,
+                         field_runout: int = 0, field_stumping: int = 0, motm: bool = False) -> str:
+    """
+    Add player bowling performance to two tables - Bowling Performance and Player Stats Summary
+    Bowling performance stores player performance against each opponent and can be seen with help of player name,
+    match id or opponent_team name, whereas Player Stats Summary shows combined performance of player from all matches
+    played in tournament by player with batting, fielding and bowling stats. It is not as detailed as individual
+    performance tables - Batting Performance and Bowling Performance
+
+    :param player_name: The name of the player.
+    :param match_id:  The id of match for player's performance
+    :param opponent_team: Opponent team in this match
+    :param balls: The total number of balls bowled by the player in this match
+    :param runs_conceded: The total number of runs given by the player while bowling in this match
+    :param wickets: The total number of wickets taken by the player in this match
+    :param maiden_overs: The total number of maiden overs thrown by bowler (maiden over = 0 runs in over)
+    :param dot_balls: The total number of dot balls thrown by bowler (dot ball = 0 run conceded)
+    :param boundaries_conceded: Number of boundaries conceded by bowler
+    :param six_conceded: Number of sixes conceded by bowler
+    :param wides: Number of wides thrown by bowler
+    :param no_balls: Number of no balls thrown by bowler
+    :param wickets_catch: The total number of wickets taken by the bowler through catches in this match
+    :param wickets_bowled: The total number of wickets taken by the bowler by hitting the wicket with a ball in this
+    match
+    :param wickets_stumped: The total number of wickets taken by the bowler through stump out in this match
+    :param wickets_lbw: The total number of wickets taken by bowler through lbw in this match
+    :param field_catch: The total number of catches taken by the player in the field in this match
+    :param field_runout: The total number of run outs player was associated with in this match
+    :param field_stumping: The total number of times the player has stumped out a batsman in this match
+    :param motm: 1 if performance of player received man of the match award
+    :return: Returns message about successful entry of player stat to database else raise error
+    :rtype: str
+    """
+    try:
+        # Create a connection to the database
+        with sqlite3.connect("ipl.db") as ipl_db:
+            ipl_cursor = ipl_db.cursor()
+
+            # First, let us check if bowling performance of player for particular match is already added or not
+            already_exist_entry = ipl_cursor.execute('''
+            SELECT * FROM "Bowling Performance" WHERE Name = ? AND "Match ID" = ?
+            ''', (player_name, match_id)).fetchone()
+            if already_exist_entry:
+                return f"Data already added for {player_name} and {match_id}"
+
+            # Now, add data to bowling performance
+            ipl_cursor.execute('''
+            INSERT INTO "Bowling Performance" (
+                Name, "Match ID", Opponent,  balls, "Runs conceded", Wickets, "Maiden over", "Dot ball", "4s conceded", 
+                "6s conceded", Wides, "No balls", "Wicket-catch", "Wicket-bowled", "Wicket-stumped", "Wicket-lbw", 
+                "Field-catch", "Field-runout", "Field-stumping", "Man of the match") 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (player_name, match_id, opponent_team, balls, runs_conceded, wickets, maiden_overs, dot_balls,
+                  boundaries_conceded, six_conceded, wides, no_balls, wickets_catch, wickets_bowled, wickets_stumped,
+                  wickets_lbw, field_catch, field_runout, field_stumping, motm))
+
+            # Now, add data to player overall performance summary table
+
+            query = '''
+            UPDATE "Player Stats Summary"
+            SET "Catches (field)" = "Catches (field)" + ?, "Run outs (field)" = "Run outs (field)" + ?, 
+            "Stumping (field)" = "Stumping (field)" + ?,"Balls (field)" = "Balls (field)" + ?, 
+            "Runs Conceded" = "Runs Conceded" + ?, Wickets = Wickets + ?, 
+            "Wicket-catch" = "Wicket-catch" + ?, "Wicket-bowled" = "Wicket-bowled" + ?, "Wicket-stumped" = 
+            "Wicket-stumped" + ?, "Wicket-lbw" ="Wicket-lbw" + ?, "Best Figure" = ?, "Best Figure" = "Best Figure" + ? 
+            WHERE "Name" = ?
+            '''
+
+            # But before that we need few extra variables to handle cases
+            # Extra variables for query for Player Stats summary
+            # Check if player hit half-century(50 runs) or century(100 runs)
+
+            # Check if current bowling figure is best bowling figure of bowler
+            current_best_bowling_figure = ipl_cursor.execute('''SELECT "Best Figure" FROM "Player Stats Summary" WHERE 
+            name = ?''', (player_name,)).fetchone()[0]
+            best_figure_run, best_figure_wicket = list(map(int, current_best_bowling_figure.split("/")))
+
+            # Player has never taken wicket in tournament
+            if best_figure_wicket == 0 and best_figure_run == 0:
+                new_best_bowling_figure = f"{runs_conceded}/{wickets}"
+
+            # Player has taken equal wicket to best bowling figure until now
+            elif wickets == best_figure_wicket:
+                new_best_bowling_figure = f"{min(runs_conceded, best_figure_run)}/{wickets}"
+            # Player has taken more wicket than best bowling figure until this match
+            elif wickets > best_figure_wicket:
+                new_best_bowling_figure = f"{runs_conceded}/{wickets}"
+            # Wicket taken by player in this match is less than best bowling figure wicket
+            else:
+                new_best_bowling_figure = current_best_bowling_figure
+
+            # print(new_best_bowling_figure)
+            # Check if bowler got more than or equal to 5 wickets
+            five_wickets = 1 if wickets >= 5 else 0
+
+            ipl_cursor.execute(query, (field_catch, field_runout, field_stumping, balls, runs_conceded, wickets,
+                                       wickets_catch, wickets_bowled, wickets_stumped, wickets_lbw,
+                                       new_best_bowling_figure, five_wickets, player_name))
+
+            # Now, if player was included in bowling attack, increase the number of matches played bowled by 1
+            if balls > 0:
+                query = '''UPDATE "Player Stats Summary"
+                SET "Match Played (ball)" = "Match Played (ball)" + 1
+                WHERE Name = ?
+                '''
+                ipl_cursor.execute(query, (player_name,))
+
+            # Close the connection
+            ipl_db.commit()
+            ipl_cursor.close()
+        return f"Fielding data added successfully for {player_name}, {match_id}"
+
+    except Exception as e:
+        print("Bowling Error", e)
+        return f"Error: {str(e)}"
 
 def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, balls: int = 0, runs_conceded: int = 0,
                          wickets: int = 0, maiden_overs: int = 0, dot_balls: int = 0, boundaries_conceded: int = 0,
