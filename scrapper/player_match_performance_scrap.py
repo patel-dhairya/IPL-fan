@@ -1,10 +1,9 @@
 import re
-import unicodedata
 import requests
 from bs4 import BeautifulSoup
 
 
-def remove_non_alphabetic_chars(string):
+def remove_non_alphabetic_chars(string: str) -> str:
     """
     This function cleans string with special characters such that Shikhar Dhawan\xa0(c) to Shikhar Dhawan
     :param string: String to clean
@@ -17,41 +16,24 @@ def remove_non_alphabetic_chars(string):
     return cleaned_string.strip()
 
 
-def get_info(url):
+def get_bowling_performance(url: str) -> dict:
+    """
+    Scrapes the bowling performances of players in a cricket match from the specified URL.
+
+    :param url: The link to the match scoreboard.
+    :return: A dictionary with player names as keys and a list of their performance statistics, including overs,
+    maidens, runs, wickets, economy, dot balls, boundaries, sixes, wides, and no balls.
+    """
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
 
-    # List to store batting and bowling performances
-    all_batting_performance = []
-    all_bowling_performance = []
-
-    # Batting Scoreboards
-    batting_scoreboard_class = soup.find_all("table", {"class": "ds-w-full ds-table ds-table-md ds-table-auto "
-                                                                "ci-scorecard-table"})
-    for score in batting_scoreboard_class:
-        rows = score.find_all('tr')
-        temp_batting_performance = []
-        for row in rows[1:]:
-            if "ds-text-tight-s" in row.get('class', []):
-                break
-            if row.get_text() == "":
-                continue
-            data = row.find_all('td')
-            name = remove_non_alphabetic_chars(data[0].text.strip())
-            dismissal = data[1].text.strip()
-            runs = data[2].text.strip()
-            balls = data[3].text.strip()
-            fours = data[5].text.strip()
-            sixes = data[6].text.strip()
-
-            temp_batting_performance.append([name, dismissal, runs, balls, fours, sixes])
-        all_batting_performance.append(temp_batting_performance)
+    # Dictionary to store bowling performances
+    all_bowling_performance = {}
 
     # Bowling Scoreboard
     bowling_scoreboard_class = soup.find_all("table", {"class": "ds-w-full ds-table ds-table-md ds-table-auto"})
     for scoreboard in bowling_scoreboard_class:
         rows = scoreboard.find_all('tr')
-        temp_bowling_performance = []
         for row in rows[1:]:
             if "ds-hidden" in row.get('class', []):
                 continue
@@ -68,50 +50,51 @@ def get_info(url):
             six = data[8].text.strip()
             wide = data[9].text.strip()
             no_balls = data[10].text.strip()
-            temp_bowling_performance.append([name, overs, maiden, runs, wickets, economy, dot, boundary, six, wide,
-                                            no_balls])
-        all_bowling_performance.append(temp_bowling_performance)
-    # scorecard = soup.find('table', class_='ds-w-full ds-table ds-table-md ds-table-auto ci-scorecard-table')
-    #
-    # rows = scorecard.find_all('tr')
-    #
-    # not_out_counter = 0
-    # # Loop through the rows and extract the data for each player
-    # for row in rows[1:]:  # Skip the first row (header)
-    #     # Extract the data for the player
+            all_bowling_performance[name] = [overs, maiden, runs, wickets, economy, dot, boundary, six, wide, no_balls]
+    return all_bowling_performance
 
-    #
-    #     if dismissal == "not out":
-    #         not_out_counter += 1
 
-    # Inning-1 Scoreboard
-    # inning1 = soup.select("table.ds-w-full.ds-table.ds-table-md.ds-table-auto.ci-scorecard-table")
-    # print(inning1)
-    #
-    # batsman_name_inning1 = inning1[0].find_all("td", {"class": "ds-w-0 ds-whitespace-nowrap ds-min-w-max ds-flex "
-    #                                                            "ds-items-center"})
-    #
-    # for name in batsman_name_inning1:
-    #     print(name.get_text())
+def get_batting_performance(url: str, scoreboard1_id: str, scoreboard2_id: str) -> dict:
+    """
+    Scrapes the batting performances of players in a cricket match from the NDTV Sports website.
 
-    # runs = soup.find_all("td", {"class": "ds-w-0 ds-whitespace-nowrap ds-min-w-max ds-flex ds-items-center"})
-    # wickets = soup.find_all("td", {"class": "ds-min-w-max !ds-pl-[100px]"})
-    #
-    # bowling_table = soup.select("table.ds-w-full.ds-table.ds-table-md.ds-table-auto")
-    # # print(bowling_table)
-    # bowlers = bowling_table[3].find_all("span", {"class": "ds-text-tight-s ds-font-medium ds-text-typo ds-underline "
-    #                                                       "ds-decoration-ui-stroke hover:ds-text-typo-primary "
-    #                                                       "hover:ds-decoration-ui-stroke-primary ds-block"})
-    # # batsman, bowler = [], []
-    # # for run in runs:
-    # #     batsman.append(" ".join(run.get_text().split()[:2]))
-    # # for wicket in wickets:
-    # #     if wicket.get_text().startswith("c") or wicket.get_text().startswith(" b"):
-    # #         bowler.append(wicket.get_text().replace('†', ''))
-    # # print(len(batsman))
-    # # print(len(bowler))
-    # # for i in range(len(batsman)):
-    # #     print(batsman[i], bowler[i])
-    # for bowler in bowlers:
-    #     print(bowler.get_text())
-    return all_batting_performance, all_bowling_performance
+    :param url: The link to the match scoreboard on the NDTV Sports website.
+    :param scoreboard1_id: The HTML class ID for the scoreboard of the first inning.
+    :param scoreboard2_id: The HTML class ID for the scoreboard of the second inning.
+    :return: A dictionary with player names as keys and a list of their performance statistics, including runs, balls,
+    fours, sixes, and dismissal reason (including if the player was not out).
+    """
+
+    def player_data_extraction(database, inning_number) -> dict:
+        """
+        Helper function to extract necessary data from the scoreboard.
+
+        :param database: A ResultSet containing the scoreboard data.
+        :param inning_number: Indicates whether it's the scoreboard of the first inning or the second inning.
+        :return: A dictionary with player performances.
+        """
+        player_dict = {}
+        for data in database:
+            player_performances = data.select(f'[id^="bat_{inning_number}"]')
+
+            for player_performance in player_performances:
+                name = player_performance.find("a").contents[0].text.strip()
+                runs = player_performance.select(f'[id^="runs_{inning_number}"]')[0].text
+                balls = player_performance.select(f'[id^="balls_{inning_number}"]')[0].text
+                boundaries = player_performance.select(f'[id^="fours_{inning_number}"]')[0].text
+                sixes = player_performance.select(f'[id^="sixes_{inning_number}"]')[0].text
+                player_dict[name] = [runs, balls, boundaries, sixes, None]
+        return player_dict
+
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    inning1 = soup.find_all(id=scoreboard1_id)
+    inning2 = soup.find_all(id=scoreboard2_id)
+    # All dismissals in the match, including "not out" if a player stayed not out till the inning completed
+    dismissals = soup.find_all(class_=["tbl_sld-ttl", "tbl_sld-tag tbl_sld-tag_1", "tbl_sld-tag tbl_sld-tag_2"])
+    player_performances_combined = {**player_data_extraction(inning1, 1), **player_data_extraction(inning2, 2)}
+
+    for index, player_performance_single in enumerate(player_performances_combined):
+        player_performances_combined[player_performance_single][4] = dismissals[index].get_text()
+
+    return player_performances_combined
