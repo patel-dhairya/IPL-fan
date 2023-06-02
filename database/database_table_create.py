@@ -551,7 +551,7 @@ def player_field_stat_db_create() -> None:
     # Field-catch : int
     #     The total number of catches taken by the player in the field in this match
     # Field-runout : int
-    #     The total number of run outs player was associated with in this match
+    #     The total number of run-outs player was associated with in this match
     # Field-stumping : int
     #     The total number of times the player has stumped out a batsman in this match
     # Man of the match : int

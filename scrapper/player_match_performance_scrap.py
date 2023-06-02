@@ -1,6 +1,28 @@
 import re
 import requests
 from bs4 import BeautifulSoup
+import sqlite3
+import os
+import asyncio
+import aiohttp
+
+current_directory = os.path.dirname(os.path.abspath(__file__))
+database_directory = os.path.join(current_directory, '..', 'database')
+ipl_db_file_path = os.path.join(database_directory, 'ipl.db')
+
+
+def find_team(player_name) -> str:
+    """
+    Function to find team for given player
+    :param player_name:  name of player
+    :return: team of player
+    """
+    with sqlite3.connect(ipl_db_file_path) as ipl_db:
+        ipl_cursor = ipl_db.cursor()
+        answer = ipl_cursor.execute('''SELECT Team FROM players WHERE name = ?''', (player_name,)).fetchone()[0]
+        ipl_db.commit()
+        ipl_cursor.close()
+    return answer
 
 
 def remove_non_alphabetic_chars(string: str) -> str:
@@ -16,10 +38,12 @@ def remove_non_alphabetic_chars(string: str) -> str:
     return cleaned_string.strip()
 
 
-def get_bowling_performance(url: str) -> dict:
+async def get_bowling_performance(url: str, teams: list, session) -> dict:
     """
     Scrapes the bowling performances of players in a cricket match from the specified URL.
 
+    :param session:
+    :param teams: List of two teams playing in that match
     :param url: The link to the match scoreboard.
     :return: A dictionary with player names as keys and a list of their performance statistics, including overs,
     maidens, runs, wickets, economy, dot balls, boundaries, sixes, wides, and no balls.
@@ -50,14 +74,19 @@ def get_bowling_performance(url: str) -> dict:
             six = data[8].text.strip()
             wide = data[9].text.strip()
             no_balls = data[10].text.strip()
-            all_bowling_performance[name] = [overs, maiden, runs, wickets, economy, dot, boundary, six, wide, no_balls]
+            player_team = find_team(name)
+            opponent = teams[1] if teams[0] == player_team else teams[0]
+            all_bowling_performance[name] = [overs, maiden, runs, wickets, economy, dot, boundary, six, wide, no_balls,
+                                             player_team, opponent]
     return all_bowling_performance
 
 
-def get_batting_performance(url: str, scoreboard1_id: str, scoreboard2_id: str) -> dict:
+async def get_batting_performance(url: str, scoreboard1_id: str, scoreboard2_id: str, teams: list, session) -> dict:
     """
     Scrapes the batting performances of players in a cricket match from the NDTV Sports website.
 
+    :param session:
+    :param teams: List of two teams playing in that match
     :param url: The link to the match scoreboard on the NDTV Sports website.
     :param scoreboard1_id: The HTML class ID for the scoreboard of the first inning.
     :param scoreboard2_id: The HTML class ID for the scoreboard of the second inning.
@@ -83,7 +112,9 @@ def get_batting_performance(url: str, scoreboard1_id: str, scoreboard2_id: str) 
                 balls = player_performance.select(f'[id^="balls_{inning_number}"]')[0].text
                 boundaries = player_performance.select(f'[id^="fours_{inning_number}"]')[0].text
                 sixes = player_performance.select(f'[id^="sixes_{inning_number}"]')[0].text
-                player_dict[name] = [runs, balls, boundaries, sixes, None]
+                player_team = find_team(name)
+                opponent = teams[1] if teams[0] == player_team else teams[0]
+                player_dict[name] = [runs, balls, boundaries, sixes, None, player_team, opponent]
         return player_dict
 
     response = requests.get(url)
