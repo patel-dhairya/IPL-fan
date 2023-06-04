@@ -1,34 +1,26 @@
+from collections import defaultdict
+
 from database_table_add import add_match, add_player_bat_data, add_player_bowl_data, add_player_field_data
 from scrapper.player_match_performance_scrap import get_bowling_performance, get_batting_performance
 import asyncio
 import aiohttp
 
 
-# Match-1
-# def match1() -> str:
-#     """
-#     Match-1 was played between CSK and GT in home ground of GT, Narendra Modi stadium. It was opening match of IPL 2023.
-#     GT won this match in thrilling way.
-#     """
-#     # Add match
-#     add_match(1, "GT", "CSK", "Narendra Modi Stadium", "GT", True, "GT", "Rashid Khan", True, "178/7", "182/5",
-#               "51/2", "65/1", 92, "Ruturaj Gaikwad", "Rashid Khan", "26/2", 63, "Shubman Gill", "Rajvardhan Hangargekar"
-#               , "36/3")
+# Match-1 def match1() -> str: """ Match-1 was played between CSK and GT in home ground of GT, Narendra Modi stadium.
+# It was opening match of IPL 2023. GT won this match in thrilling way. """ # Add match add_match(1, "GT", "CSK",
+# "Narendra Modi Stadium", "GT", True, "GT", "Rashid Khan", True, "178/7", "182/5", "51/2", "65/1", 92,
+# "Ruturaj Gaikwad", "Rashid Khan", "26/2", 63, "Shubman Gill", "Rajvardhan Hangargekar" , "36/3")
 #
-#     # Add player performance
-#     # Inning-1 => CSK BAT and GT Field
-#     # CSK BAT
-#     add_player_bat_data("Devon Conway", 1, "GT", 1, 6, 0, 0, False, "bowled", "Mohammed Shami", "None", False)
-#     add_player_bat_data("Ruturaj Gaikwad", 1, " GT", 92, 50, 4, 9, False, "catch", "Alzarri Joseph", "Shubman Gill",
-#                         False)
-#     add_player_bat_data("Moeen Ali", 1, "GT", 23, 17, 4, 1, False, "catch", "Rashid Khan", "Wriddhiman Saha", False)
-#     add_player_bat_data("Ben Stokes", 1, "GT", 7, 6, 1, 0, False, "catch", "Rashid Khan", "Wriddhiman Saha", False)
-#     add_player_bat_data("Ambati Rayudu", 1, "GT", 12, 12, 0, 1, False, "bowled", "Joshua Little", "None", False)
-#     add_player_bat_data("Shivam Dube", 1, "GT", 19, 18, 0, 1, False, "catch", "Mohammed Shami", "Rashid Khan", False)
-#     add_player_bat_data("Ravindra Jadeja", 1, "GT", 1, 2, 0, 0, False, "catch", "Alzarri Joseph", "Vijay Shankar", False
-#                         )
-#     add_player_bat_data("MS Dhoni", 1, "GT", 14, 7, 1, 1, True, "None", "None", "None", motm=False)
-#     add_player_bat_data("Mitchell Santner", 1, "GT", 1, 3, 0, 0, True, "None", "None", "None", motm=False)
+# # Add player performance # Inning-1 => CSK BAT and GT Field # CSK BAT add_player_bat_data("Devon Conway", 1, "GT",
+# 1, 6, 0, 0, False, "bowled", "Mohammed Shami", "None", False) add_player_bat_data("Ruturaj Gaikwad", 1, " GT", 92,
+# 50, 4, 9, False, "catch", "Alzarri Joseph", "Shubman Gill", False) add_player_bat_data("Moeen Ali", 1, "GT", 23,
+# 17, 4, 1, False, "catch", "Rashid Khan", "Wriddhiman Saha", False) add_player_bat_data("Ben Stokes", 1, "GT", 7, 6,
+# 1, 0, False, "catch", "Rashid Khan", "Wriddhiman Saha", False) add_player_bat_data("Ambati Rayudu", 1, "GT", 12,
+# 12, 0, 1, False, "bowled", "Joshua Little", "None", False) add_player_bat_data("Shivam Dube", 1, "GT", 19, 18, 0,
+# 1, False, "catch", "Mohammed Shami", "Rashid Khan", False) add_player_bat_data("Ravindra Jadeja", 1, "GT", 1, 2, 0,
+# 0, False, "catch", "Alzarri Joseph", "Vijay Shankar", False ) add_player_bat_data("MS Dhoni", 1, "GT", 14, 7, 1, 1,
+# True, "None", "None", "None", motm=False) add_player_bat_data("Mitchell Santner", 1, "GT", 1, 3, 0, 0, True,
+# "None", "None", "None", motm=False)
 #
 #     # GT Field
 #     add_player_bowl_data("Mohammed Shami", 1, "CSK", 24, 29, 2, 0, 13, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0, 0, False)
@@ -69,10 +61,15 @@ import aiohttp
 
 
 async def match_data(match_id: int, home_team: str, away_team: str, stadium: str, toss_winner: str, toss_decision: str,
-                     night_match: bool, match_winner: str, man_of_the_match: str, batting_url: str, bowling_url: str,
-                     i1: str, i2: str) -> str:
+                     night_match: bool, match_winner: str, score_inning1: str, score_inning2: str,
+                     man_of_the_match: str, batting_url: str, bowling_url: str, scoreboard1_tag: str,
+                     scoreboard2_tag: str) -> str:
     """
 
+    :param scoreboard1_tag:
+    :param score_inning2:
+    :param score_inning1:
+    :param scoreboard2_tag:
     :param match_id:
     :param home_team:
     :param away_team:
@@ -84,8 +81,6 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
     :param man_of_the_match:
     :param batting_url:
     :param bowling_url:
-    :param i1:
-    :param i2:
     :return:
     """
 
@@ -124,6 +119,11 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
             bowler = dismissal_reason.split(' b')[1].strip()
             return ["lbw", bowler.strip()]
 
+        # Check if player was bowled by bowler
+        elif dismissal_reason[0] == "b":
+            bowler = dismissal_reason.split("b ")[1]
+            return ["bowled", bowler.strip()]
+
         # Check if player was run out
         elif "run out" in dismissal_reason:
             # Run out is in the format of "run out (Tim David / Ishan Kishan)" This function only focuses on the
@@ -138,7 +138,8 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
 
     async with aiohttp.ClientSession() as session:
         bowling_task = asyncio.create_task(get_bowling_performance(bowling_url, teams, session))
-        batting_task = asyncio.create_task(get_batting_performance(batting_url, i1, i2, teams, session))
+        batting_task = asyncio.create_task(get_batting_performance(batting_url, scoreboard1_tag, scoreboard2_tag,
+                                                                   teams, session))
         await asyncio.gather(bowling_task, batting_task)
 
         bowling_performances = await bowling_task
@@ -146,10 +147,42 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
 
     highest_score_inning1 = ("name", 0)
     highest_score_inning2 = ("name", 0)
-    fielding_wickets = {}
+
+    # Batting and Fielding Performance
+
+    # Dictionaries to store information about all the fielders/wicket keeper who were part of either catch, stumping out
+    # or run out
+    # I used default dict so in future when I need this dictionary with int and if player do not exist then it can
+    # return 0
+    fielder_catch = defaultdict(int)
+    fielder_run_out = defaultdict(int)
+    wicketkeeper_stump_out = defaultdict(int)
+    bowler_catch = defaultdict(int)
+    bowler_stump_out = defaultdict(int)
+    bowler_lbw = defaultdict(int)
+    bowler_bowled = defaultdict(int)
+    fielder_opponent_team = {}
     for batting_performance in batting_performances:
         name = batting_performance
         runs, balls, fours, sixes, dismissal, playing_team, opponent_team = batting_performances[name]
+        dismissal_type = dismissal_information(dismissal)
+        if isinstance(dismissal_type, list):
+            if dismissal_type[0] != "lbw" or dismissal_type[0] != "bowler":
+                if dismissal_type[0] == "catch":
+                    fielder_catch[dismissal_type[1]] += 1
+                    bowler_catch[dismissal_type[2]] += 1
+                if dismissal_type[0] == "stump-out":
+                    wicketkeeper_stump_out[dismissal_type[1]] += 1
+                    bowler_stump_out[dismissal_type[2]] += 1
+                if dismissal_type[0] == "run out":
+                    fielder_run_out[dismissal_type[1]] += 1
+                fielder_opponent_team[dismissal_type[1]] = playing_team
+            # player was lbw
+            else:
+                if dismissal_type[0] == "lbw":
+                    bowler_lbw[dismissal_type[1]] += 1
+                else:
+                    bowler_bowled[dismissal_type[1]] += 1
 
         # find the high scorer player for both teams
         if home_team == playing_team:
@@ -162,6 +195,29 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
         add_player_bat_data(name, match_id, opponent_team, runs, balls, fours, sixes,
                             True if dismissal is "not out" else False,
                             motm=True if man_of_the_match is name else False)
+
+    # Add fielding data for run out, catch and stump out
+    fielding_combination = {fielder: (fielder_catch.get(fielder, 0), wicketkeeper_stump_out.get(fielder, 0),
+                                      fielder_run_out.get(fielder, 0)) for fielder in set(fielder_catch) |
+                            set(wicketkeeper_stump_out) | set(fielder_run_out)}
+
+    for fielder in fielding_combination:
+        name, catches, stump_outs, run_outs = fielder, fielding_combination[fielder][0], \
+            fielding_combination[fielder][1], fielding_combination[fielder][2]
+        add_player_field_data(name, match_id, fielder_opponent_team[name], catches, run_outs, stump_outs)
+
+    # Add bowling data
+    for bowling_performance in bowling_performances:
+        name = bowling_performance
+        player_overs, maiden, runs, wickets, economy, dot, boundary, six, wide, no_balls, player_team, opponent = \
+            bowling_performances[name]
+        add_player_bowl_data(name, match_id, opponent,
+                             (lambda overs: int(player_overs) * 6 + int(
+                                 (player_overs - int(player_overs)) * 10) * 6 // 10)(player_overs),
+                             runs, wickets, maiden, dot, boundary, six, wide, no_balls, bowler_catch[name],
+                             bowler_bowled[name], bowler_stump_out[name], bowler_lbw[name],
+                             motm=True if man_of_the_match is name else False
+                             )
 
     print(bowling_performances)
     print(batting_performances)
@@ -177,16 +233,11 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
 #                        "-mumbai-indians-qualifier-2-1370352/full-scorecard",
 #                        temp_i1, temp_i2))
 
-# def semifinal3() -> str:
-#     """
-#     Semifinal 3 match was played between MI and GT. MI won 2nd semi-final match against LSG whereas GT lost 1st
-#     semi-final against CSK. Winner would face CSK in ipl 2023 final
-#     :return: str : Confirmation that match data successfully added to tables
-#     """
-#     man_of_the_match = "Shubman Gill"
-#     add_match(73, "GT", "MI", "Narendra Modi Stadium", "MI", True, "GT", man_of_the_match, True, "233/3", "171", "50/0"
-#               , "72/3", 129, man_of_the_match, "Jason Behrendorff", "28/0", 61, "Suryakumar Yadav", "Mohit Sharma",
-#               "10/5")
+# def semifinal3() -> str: """ Semifinal 3 match was played between MI and GT. MI won 2nd semi-final match against
+# LSG whereas GT lost 1st semi-final against CSK. Winner would face CSK in ipl 2023 final :return: str : Confirmation
+# that match data successfully added to tables """ man_of_the_match = "Shubman Gill" add_match(73, "GT", "MI",
+# "Narendra Modi Stadium", "MI", True, "GT", man_of_the_match, True, "233/3", "171", "50/0" , "72/3", 129,
+# man_of_the_match, "Jason Behrendorff", "28/0", 61, "Suryakumar Yadav", "Mohit Sharma", "10/5")
 #
 #     bowling_performances = get_bowling_performance("https://www.espncricinfo.com/series/indian-premier-league-2023"
 #                                                    "-1345038/gujarat-titans-vs-mumbai-indians-qualifier-2-1370352"
