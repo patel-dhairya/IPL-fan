@@ -10,6 +10,8 @@ current_directory = os.path.dirname(os.path.abspath(__file__))
 database_directory = os.path.join(current_directory, '..', 'database')
 ipl_db_file_path = os.path.join(database_directory, 'ipl.db')
 
+double_names = {"Mohammed Shami": "Mohammad Shami", "Josh Little": "Joshua Little"}
+
 
 def find_team(player_name) -> str:
     """
@@ -17,6 +19,8 @@ def find_team(player_name) -> str:
     :param player_name:  name of player
     :return: team of player
     """
+    if player_name in double_names:
+        player_name = double_names[player_name]
     with sqlite3.connect(ipl_db_file_path) as ipl_db:
         ipl_cursor = ipl_db.cursor()
         answer = ipl_cursor.execute('''SELECT Team FROM players WHERE name = ?''', (player_name,)).fetchone()[0]
