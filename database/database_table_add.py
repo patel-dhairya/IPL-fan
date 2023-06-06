@@ -96,7 +96,7 @@ def add_player_bat_data(player_name: str, match_id: int, opponent_team: str, run
         return f"Batting data added successfully for {player_name}, {match_id}"
 
     except Exception as e:
-        print("Batting Error", e)
+        print(f"Batting Error: {player_name}", e)
         return f"Error: {str(e)}"
 
 
@@ -163,7 +163,7 @@ def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, ba
             SET "Match Played (ball)" = "Match Played (ball)" + 1,
             "Balls (field)" = "Balls (field)" + ?, "Runs Conceded" = "Runs Conceded" + ?, Wickets = Wickets + ?, 
             "Wicket-catch" = "Wicket-catch" + ?, "Wicket-bowled" = "Wicket-bowled" + ?, "Wicket-stumped" = 
-            "Wicket-stumped" + ?, "Wicket-lbw" ="Wicket-lbw" + ?, "Best Figure" = ?, "Best Figure" = "Best Figure" + ? 
+            "Wicket-stumped" + ?, "Wicket-lbw" ="Wicket-lbw" + ?, "Best Figure" = ?, "Five Wickets" = "Five Wickets" + ? 
             WHERE "Name" = ?
             '''
 
@@ -174,7 +174,8 @@ def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, ba
             # Check if current bowling figure is best bowling figure of bowler
             current_best_bowling_figure = ipl_cursor.execute('''SELECT "Best Figure" FROM "Player Stats Summary" WHERE 
             name = ?''', (player_name,)).fetchone()[0]
-            best_figure_run, best_figure_wicket = list(map(int, current_best_bowling_figure.split("/")))
+            best_figure_run = int(current_best_bowling_figure.split("/")[0])
+            best_figure_wicket = int(current_best_bowling_figure.split("/")[1])
 
             # Player has never taken wicket in tournament
             if best_figure_wicket == 0 and best_figure_run == 0:
@@ -196,14 +197,6 @@ def add_player_bowl_data(player_name: str, match_id: int, opponent_team: str, ba
 
             ipl_cursor.execute(query, (balls, runs_conceded, wickets, wickets_catch, wickets_bowled, wickets_stumped,
                                        wickets_lbw, new_best_bowling_figure, five_wickets, player_name))
-
-            # Now, if player was included in bowling attack, increase the number of matches played bowled by 1
-            if balls > 0:
-                query = '''UPDATE "Player Stats Summary"
-                SET "Match Played (ball)" = "Match Played (ball)" + 1
-                WHERE Name = ?
-                '''
-                ipl_cursor.execute(query, (player_name,))
 
             # Close the connection
             ipl_db.commit()
@@ -325,7 +318,6 @@ def add_match(match_id: int, home_team: str, away_team: str, stadium: str, toss_
             # Close the connection
             ipl_db.commit()
             ipl_cursor.close()
-        print("Done")
         return f"Match-{match_id}) {home_team} vs {away_team} added successfully."
 
     except sqlite3.IntegrityError:

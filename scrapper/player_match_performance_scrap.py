@@ -5,12 +5,11 @@ import sqlite3
 import os
 import asyncio
 import aiohttp
+from database.double_names import change_name
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 database_directory = os.path.join(current_directory, '..', 'database')
 ipl_db_file_path = os.path.join(database_directory, 'ipl.db')
-
-double_names = {"Mohammed Shami": "Mohammad Shami", "Josh Little": "Joshua Little"}
 
 
 def find_team(player_name) -> str:
@@ -19,11 +18,12 @@ def find_team(player_name) -> str:
     :param player_name:  name of player
     :return: team of player
     """
-    if player_name in double_names:
-        player_name = double_names[player_name]
     with sqlite3.connect(ipl_db_file_path) as ipl_db:
         ipl_cursor = ipl_db.cursor()
-        answer = ipl_cursor.execute('''SELECT Team FROM players WHERE name = ?''', (player_name,)).fetchone()[0]
+        try:
+            answer = ipl_cursor.execute('''SELECT Team FROM players WHERE name = ?''', (player_name,)).fetchone()[0]
+        except TypeError:
+            print(f"{player_name}")
         ipl_db.commit()
         ipl_cursor.close()
     return answer
@@ -66,7 +66,7 @@ async def get_bowling_performance(url: str, teams: list, session) -> dict:
             if "ds-hidden" in row.get('class', []):
                 continue
             data = row.find_all("td")
-            name = remove_non_alphabetic_chars(data[0].text.strip())
+            name = change_name(remove_non_alphabetic_chars(data[0].text.strip()))
 
             overs = data[1].text.strip()
             maiden = data[2].text.strip()
@@ -111,7 +111,13 @@ async def get_batting_performance(url: str, scoreboard1_id: str, scoreboard2_id:
             player_performances = data.select(f'[id^="bat_{inning_number}"]')
 
             for player_performance in player_performances:
-                name = player_performance.find("a").contents[0].text.strip()
+                # print(player_performance.find("a"))
+                name = player_performance.find("a")
+                # This happens when name is not linked to player profile in ndtv sports website
+                if name is None:
+                    name = change_name(player_performance.find('td').contents[0].strip())
+                else:
+                    name = change_name(name.contents[0].text.strip())
                 runs = player_performance.select(f'[id^="runs_{inning_number}"]')[0].text
                 balls = player_performance.select(f'[id^="balls_{inning_number}"]')[0].text
                 boundaries = player_performance.select(f'[id^="fours_{inning_number}"]')[0].text

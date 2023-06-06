@@ -1,12 +1,11 @@
-import copy
 from collections import defaultdict
 
+import database.database_table_create
+from database.double_names import change_name
 from database_table_add import add_match, add_player_bat_data, add_player_bowl_data, add_player_field_data
 from scrapper.player_match_performance_scrap import get_bowling_performance, get_batting_performance
 import asyncio
 import aiohttp
-
-double_names = {"Mohammed Shami": "Mohammad Shami", "Josh Little": "Joshua Little"}
 
 
 async def match_data(match_id: int, home_team: str, away_team: str, stadium: str, toss_winner: str, toss_decision: str,
@@ -112,7 +111,7 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
     bowler_bowled = defaultdict(int)
     fielder_opponent_team = {}
     for batting_performance in batting_performances:
-        name = batting_performance
+        name = change_name(batting_performance)
         runs, balls, fours, sixes, dismissal, playing_team, opponent_team = batting_performances[name]
 
         # check if player got duck out
@@ -144,6 +143,8 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
             wicket_taken_bowler = dismissal_type[1]
         else:
             pass
+        wicket_taken_bowler = change_name(wicket_taken_bowler)
+        wicket_taken_fielder = change_name(wicket_taken_fielder)
 
         # find the high scorer player for both teams
         if home_team == playing_team:
@@ -164,7 +165,7 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
                             set(wicketkeeper_stump_out) | set(fielder_run_out)}
 
     for fielder in fielding_combination:
-        name = fielder
+        name = change_name(fielder)
         catches, stump_outs, run_outs = fielding_combination[fielder][0], fielding_combination[fielder][1], \
             fielding_combination[fielder][2]
         add_player_field_data(name, match_id, fielder_opponent_team[name], catches, run_outs, stump_outs)
@@ -177,9 +178,7 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
     highest_wicket_away_team = ("name", 150, 0)
 
     for bowling_performance in bowling_performances:
-        name = bowling_performance
-        if name in double_names:
-            name = double_names[name]
+        name = change_name(bowling_performance)
         player_overs, maiden, runs, wickets, economy, dot, boundary, six, wide, no_balls, player_team, opponent = \
             bowling_performances[bowling_performance]
         maiden, runs, wickets, dot, boundary, six, wide, no_balls = int(maiden), int(runs), int(wickets), int(dot), \
@@ -244,12 +243,64 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
     return f"Data successfully added for match id - {match_id} between {home_team} and {away_team}."
 
 
-temp_i1 = 'tbody_2955'
-temp_i2 = 'tbody_1111'
-asyncio.run(match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
-                       "72/3", "Shubman Gill",
-                       "https://sports.ndtv.com/cricket/gt-vs-mi-scorecard-live-cricket-score-ipl-2023-qualifier-2"
-                       "-ahmmi05262023225989",
-                       "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
-                       "-mumbai-indians-qualifier-2-1370352/full-scorecard",
-                       temp_i1, temp_i2))
+def match1():
+    asyncio.run(match_data(1, "GT", "CSK", "Narendra Modi Stadium", "GT", "field", True, "GT", "182/5", "65/1",
+                           "178/7", "51/2", "Rashid Khan", "https://sports.ndtv.com/cricket/gt-vs-csk-scorecard-live"
+                                                           "-cricket-score-ipl-2023-match-1-ahmck03312023219154",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
+                           "-chennai-super-kings-1st-match-1359475/full-scorecard", "tbody_1108", "tbody_2955"))
+
+
+def match2():
+    asyncio.run(match_data(2, "PBKS", "KKR", "Punjab Cricket Association IS Bindra Stadium", "KKR", "field", False,
+                           "PBKS", "191/5", "56/1", "146/7", "46/3", "Arshdeep Singh",
+                           "https://sports.ndtv.com/cricket/pbks-vs-kkr-scorecard-live-cricket-score-ipl-2023-match-2"
+                           "-kpkr04012023219155",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/punjab-kings-vs"
+                           "-kolkata-knight-riders-2nd-match-1359476/full-scorecard", "tbody_1107", "tbody_1106"))
+
+
+def match3():
+    asyncio.run(match_data(3, "LSG", "DC", "Atal Bihari Vajpayee Ekana Cricket Stadium", "DC", "field", True, "LSG",
+                           "193/6", "30/1", "143/9", "47/2", "Mark Wood",
+                           "https://sports.ndtv.com/cricket/lsg-vs-dc-scorecard-live-cricket-score-ipl-2023-match-3"
+                           "-lkodd04012023219156",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/lucknow-super"
+                           "-giants-vs-delhi-capitals-3rd-match-1359477/full-scorecard",
+                           "tbody_2954", "tbody_1109"))
+
+
+def match4():
+    asyncio.run(match_data(4, "SRH", "RR", "Rajiv Gandhi International Stadium", "SRH", "field", False, "RR", "203/5",
+                           "85/1", "131/8", "30/2", "Jos Buttler",
+                           "https://sports.ndtv.com/cricket/srh-vs-rr-scorecard-live-cricket-score-ipl-2023-match-4"
+                           "-shrr04022023219157",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/sunrisers"
+                           "-hyderabad-vs-rajasthan-royals-4th-match-1359478/full-scorecard",
+                           "tbody_1110", "tbody_1379"
+                           ))
+
+def match5():
+    asyncio.run(match_data(5, "RCB", "MI", "MA Chidambaram Stadium", "RCB", "field", True, "RCB", "171/7", "29/3",
+                           "172/2", "53/0", "Faf du Plessis",
+                           "https://sports.ndtv.com/cricket/rcb-vs-mi-scorecard-live-cricket-score-ipl-2023-match-5"
+                           "-bcmi04022023219158",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/royal-challengers"
+                           "-bangalore-vs-mumbai-indians-5th-match-1359479/full-scorecard",
+                           "tbody_1111", "tbody_1105"))
+
+
+# database.database_table_create.create_database()
+# match1()
+# match2()
+# match3()
+# match4()
+# match5()
+
+# asyncio.run(match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
+#                        "72/3", "Shubman Gill",
+#                        "https://sports.ndtv.com/cricket/gt-vs-mi-scorecard-live-cricket-score-ipl-2023-qualifier-2"
+#                        "-ahmmi05262023225989",
+#                        "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
+#                        "-mumbai-indians-qualifier-2-1370352/full-scorecard",
+#                        'tbody_2955', 'tbody_1111'))

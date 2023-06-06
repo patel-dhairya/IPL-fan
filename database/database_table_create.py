@@ -358,7 +358,8 @@ def player_total_stats_db_create() -> None:
         "Wicket-bowled" INTEGER NOT NULL DEFAULT 0,
         "Wicket-stumped" INTEGER NOT NULL DEFAULT 0,
         "Wicket-lbw" INTEGER NOT NULL DEFAULT 0,
-        "Best Figure" TEXT NOT NULL DEFAULT '0/0'
+        "Best Figure" TEXT NOT NULL DEFAULT '0/0',
+        "Five Wickets" INTEGER NOT NULL DEFAULT 0
         )
     ''')
 
@@ -584,10 +585,12 @@ def player_field_stat_db_create() -> None:
 Comment out following code to create tables
 """
 
-team_db_create()
-player_db_create()
-match_db_create()
-player_total_stats_db_create()
-player_bat_stat_db_create()
-player_ball_stat_db_create()
-player_field_stat_db_create()
+
+def create_database():
+    team_db_create()
+    player_db_create()
+    match_db_create()
+    player_total_stats_db_create()
+    player_bat_stat_db_create()
+    player_ball_stat_db_create()
+    player_field_stat_db_create()
