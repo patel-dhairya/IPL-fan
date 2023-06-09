@@ -13,24 +13,24 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
                      score_inning2: str, score_powerplay_inning2: str, man_of_the_match: str, batting_url: str,
                      bowling_url: str, scoreboard1_tag: str, scoreboard2_tag: str) -> str:
     """
-    :param score_powerplay_inning2:
-    :param score_powerplay_inning1:
-    :param scoreboard1_tag:
-    :param score_inning2:
-    :param score_inning1:
-    :param scoreboard2_tag:
-    :param match_id:
-    :param home_team:
-    :param away_team:
-    :param stadium:
-    :param toss_winner:
-    :param toss_decision:
-    :param night_match:
-    :param match_winner:
-    :param man_of_the_match:
-    :param batting_url:
-    :param bowling_url:
-    :return:
+    :param match_id: Unique match id representing each match starting from 1
+    :param home_team: Home team in the match
+    :param away_team: Away team in the match
+    :param stadium: Name of stadium where match took place
+    :param toss_winner: Name of team that won toss
+    :param toss_decision: bat if winner of toss decided to bat first else field
+    :param night_match: False if match was played in afternoon else True
+    :param match_winner: Name of team that won match
+    :param score_inning1: Runs scored by team batting first in format of runs/wickets.
+    :param score_powerplay_inning1: Score of team batting first in first six overs
+    :param score_inning2: Runs scored by team batting second in format of runs/wickets
+    :param score_powerplay_inning2: Score of team batting second in first six overs
+    :param man_of_the_match: Name of player that won man of the match award
+    :param batting_url: URL representing webpage of NDTV sports with scoreboard of this match
+    :param bowling_url: URL representing webpage of espn cricinfo with scoreboard of this match
+    :param scoreboard1_tag: HTML attribute class name for scoreboard1 on ndtv website
+    :param scoreboard2_tag: HTML attribute class name for scoreboard2 on ndtv website
+    :return: String suggesting data for match added successfully
     """
 
     def dismissal_information(dismissal_reason) -> list | None:
