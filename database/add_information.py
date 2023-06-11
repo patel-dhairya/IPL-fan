@@ -297,10 +297,13 @@ def match5():
 # match4()
 # match5()
 
-# asyncio.run(match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
-#                        "72/3", "Shubman Gill",
-#                        "https://sports.ndtv.com/cricket/gt-vs-mi-scorecard-live-cricket-score-ipl-2023-qualifier-2"
-#                        "-ahmmi05262023225989",
-#                        "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
-#                        "-mumbai-indians-qualifier-2-1370352/full-scorecard",
-#                        'tbody_2955', 'tbody_1111'))
+def match73():
+    asyncio.run(match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
+                           "72/3", "Shubman Gill",
+                           "https://sports.ndtv.com/cricket/gt-vs-mi-scorecard-live-cricket-score-ipl-2023-qualifier-2"
+                           "-ahmmi05262023225989",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
+                           "-mumbai-indians-qualifier-2-1370352/full-scorecard",
+                           'tbody_2955', 'tbody_1111'))
+
+# match73()
