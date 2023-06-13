@@ -1,6 +1,6 @@
-# As program uses two different websites for batting and fielding performance scrap, sometimes players name have typo
-# on one of website which could create trouble in storing all data related to player. To solve that issue, this file
-# will have single function which can use stored name typo dictionary to return correct name
+# The main program scrapes batting and fielding performance data from two different websites. However, there may be
+# typos in players' names on one of the websites, which can cause issues when storing the data. To address this problem,
+# this file contains a function that uses a dictionary to return the correct name for a player.
 
 # Dictionary to store the corrected names for players with typos on one of the websites
 name_corrections = {
