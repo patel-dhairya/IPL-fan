@@ -300,6 +300,16 @@ def match6():
                            "tbody_1108", "tbody_2954"))
 
 
+def match7():
+    asyncio.run(match_data(7, "DC", "GT", "Arun Jaitley Stadium", "GT", "field", True, "GT", "162/8", "52/2", "163/4",
+                           "54/3", "Sai Sudharsan",
+                           "https://sports.ndtv.com/cricket/dc-vs-gt-scorecard-live-cricket-score-ipl-2023-match-7"
+                           "-ddahm04042023222176",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/delhi-capitals-vs"
+                           "-gujarat-titans-7th-match-1359481/full-scorecard",
+                           "tbody_1109", "tbody_2955"))
+
+
 def match73():
     asyncio.run(match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
                            "72/3", "Shubman Gill",
@@ -317,4 +327,5 @@ def match73():
 # match4()
 # match5()
 # match6()
+# match7()
 # match73()
