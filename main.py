@@ -8,20 +8,20 @@ player_data = pd.read_csv("database/player_data.csv")
 
 def research_question1(pd_data):
     print("Question - 1")
-    print("""Is player positions structure same across all teams? What I like to know is if all teams favour same ratio 
-    for different roles such as batsman, bowler, wicketkeeper and so on.""")
+    print("Are player positions structured the same across all teams? What I would like to know is whether all teams"
+          "have a similar ratio for different roles, such as batsmen, bowlers, wicketkeepers, and so on.")
     print("Answer - 1")
-    print("First, let us look at frequency table of player roles and team")
+    print("First, let's examine a frequency table of player roles within teams.")
 
     frequency_table = pd_data.pivot_table(values='Name', index=['Team'], columns=['Role'], aggfunc=len,
                                           fill_value=0, margins=True)
 
     print("Frequency Table")
     print(frequency_table)
-    print("From the frequency table, we can clearly see that not all teams are following same ratio between their roles"
+    print("From the frequency table, it is evident that teams do not follow the same ratio for their player roles."
           )
 
-    print("Now, let us look at stacked bar chart for better understanding")
+    print("Now, let's take a look at a stacked bar chart to gain a better understanding.")
     playing_positions = player_data.groupby(["Team", "Role"]).size().unstack()
 
     # Choose color palette for chart
@@ -34,9 +34,14 @@ def research_question1(pd_data):
     ax.set_title("Player positions across all teams")
     plt.show()
     print("Conclusion for Question-1")
-    print("No. It looks like there is no common structure for positions. No two teams have same structure for team."
-          "The reason could be each team have different star player in different position, if one team has 2 star "
-          "bowlers, they are less likely to add more back up bowlers to their team")
+    print("It appears that there is no common structure for player positions among teams. Each team seems to have a "
+          "unique arrangement based on their individual circumstances. One possible reason for this variation could "
+          "be the presence of star players in different positions. For example, if a team has two exceptional "
+          "bowlers, they may be less inclined to include additional backup bowlers in their team."
+          "In addition to the influence of star players, it's worth noting that coaches sometimes exhibit a "
+          "preference for certain player positions as well. They may have a strategic or tactical inclination towards "
+          "emphasizing specific roles within the team composition. This further contributes to the diversity and "
+          "variation in player positions across different teams.")
 
 
 # def research_question2(p_data: pd.DataFrame):
