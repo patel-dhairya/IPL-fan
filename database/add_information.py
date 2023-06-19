@@ -226,12 +226,12 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
         else highest_score_away_team
     inning1_best_bowler = highest_wicket_home_team[0] if inning1_batting_team == away_team else \
         highest_wicket_away_team[0]
-    inning1_best_bowling = '/'.join(str(x) for x in highest_wicket_home_team[1:3]) if inning1_batting_team == away_team\
+    inning1_best_bowling = '/'.join(str(x) for x in highest_wicket_home_team[1:3]) if inning1_batting_team == away_team \
         else '/'.join(str(x) for x in highest_wicket_away_team[1:3])
 
     inning2_best_bowler = highest_wicket_home_team[0] if inning1_batting_team == home_team else \
         highest_wicket_away_team[0]
-    inning2_best_bowling = '/'.join(str(x) for x in highest_wicket_home_team[1:3]) if inning1_batting_team == home_team\
+    inning2_best_bowling = '/'.join(str(x) for x in highest_wicket_home_team[1:3]) if inning1_batting_team == home_team \
         else '/'.join(str(x) for x in highest_wicket_away_team[1:3])
 
     add_match(match_id, home_team, away_team, stadium, toss_winner, True if toss_decision == "field" else False,
@@ -280,6 +280,7 @@ def match4():
                            "tbody_1110", "tbody_1379"
                            ))
 
+
 def match5():
     asyncio.run(match_data(5, "RCB", "MI", "M.Chinnaswamy Stadium", "RCB", "field", True, "RCB", "171/7", "29/3",
                            "172/2", "53/0", "Faf du Plessis",
@@ -310,15 +311,25 @@ def match7():
                            "tbody_1109", "tbody_2955"))
 
 
-def match73():
-    asyncio.run(match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
-                           "72/3", "Shubman Gill",
-                           "https://sports.ndtv.com/cricket/gt-vs-mi-scorecard-live-cricket-score-ipl-2023-qualifier-2"
-                           "-ahmmi05262023225989",
+def match13():
+    asyncio.run(match_data(13, "GT", "KKR", "Narendra Modi Stadium", "GT", "field", False, "KKR", "204/4", "54/1",
+                           "207/7", "43/2", "Rinku Singh",
+                           "https://sports.ndtv.com/cricket/gt-vs-kkr-scorecard-live-cricket-score-ipl-2023-match-13"
+                           "-ahmkr04092023222185",
                            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
-                           "-mumbai-indians-qualifier-2-1370352/full-scorecard",
-                           'tbody_2955', 'tbody_1111'))
+                           "-kolkata-knight-riders-13th-match-1359487/full-scorecard",
+                           "tbody_2955", "tbody_1106"))
 
+
+def match73():
+    asyncio.run(
+        match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
+                   "72/3", "Shubman Gill",
+                   "https://sports.ndtv.com/cricket/gt-vs-mi-scorecard-live-cricket-score-ipl-2023-qualifier-2"
+                   "-ahmmi05262023225989",
+                   "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
+                   "-mumbai-indians-qualifier-2-1370352/full-scorecard",
+                   'tbody_2955', 'tbody_1111'))
 
 # database.database_table_create.create_database()
 # match1()
@@ -328,4 +339,5 @@ def match73():
 # match5()
 # match6()
 # match7()
+# match13()
 # match73()

@@ -19,6 +19,11 @@ def change_name(name: str) -> str:
     :param name: The name of the player to check
     :return: The corrected name if there is a typo, otherwise the original name
     """
+    # Remove sub from player name
+    name_divide = name.split(" ")
+    if name_divide[0] == "sub":
+        name = " ".join(name_divide[1:])
+
     if name in name_corrections:
         return name_corrections[name]
     else:
