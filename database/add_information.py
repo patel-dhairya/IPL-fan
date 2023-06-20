@@ -73,7 +73,7 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
             return ["bowled", bowler.strip()]
 
         # Check if player was run out
-        elif "run-out" in dismissal_reason:
+        elif "run out" in dismissal_reason:
             # Run out is in the format of "run out (Tim David / Ishan Kishan)" This function only focuses on the
             # primary contributor to the run out if there is more than one fielder involved
             fielders = dismissal_reason[dismissal_reason.index('(') + 1: dismissal_reason.index(')')].split('/')
@@ -321,6 +321,15 @@ def match13():
                            "tbody_2955", "tbody_1106"))
 
 
+def match18():
+    asyncio.run(match_data(18, "PBKS", "GT", "Punjab Cricket Association IS Bindra Stadium", "GT", "field", True,
+                           "GT", "153/8", "52/2", "154/4", "56/1", "Mohit Sharma",
+                           "https://sports.ndtv.com/cricket/pbks-vs-gt-scorecard-live-cricket-score-ipl-2023-match-18"
+                           "-kpahm04132023222190",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/punjab-kings-vs"
+                           "-gujarat-titans-18th-match-1359492/full-scorecard",
+                           "tbody_1107", "tbody_2955"))
+
 def match73():
     asyncio.run(
         match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
@@ -340,4 +349,5 @@ def match73():
 # match6()
 # match7()
 # match13()
+match18()
 # match73()
