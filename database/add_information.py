@@ -330,6 +330,17 @@ def match18():
                            "-gujarat-titans-18th-match-1359492/full-scorecard",
                            "tbody_1107", "tbody_2955"))
 
+
+def match23():
+    asyncio.run(match_data(23, "GT", "RR", "Narendra Modi Stadium", "RR", "field", True, "RR", "177/7", "42/2", "179/7",
+                           "26/2", "Shimron Hetmyer",
+                           "https://sports.ndtv.com/cricket/gt-vs-rr-scorecard-live-cricket-score-ipl-2023-match-23"
+                           "-ahmrr04162023222195",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
+                           "-rajasthan-royals-23rd-match-1359497/full-scorecard",
+                           "tbody_2955", "tbody_1110"))
+
+
 def match73():
     asyncio.run(
         match_data(73, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "233/3", "50/0", "171/10",
@@ -349,5 +360,6 @@ def match73():
 # match6()
 # match7()
 # match13()
-match18()
+# match18()
+# match23()
 # match73()
