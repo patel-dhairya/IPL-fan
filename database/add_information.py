@@ -340,6 +340,15 @@ def match23():
                            "-rajasthan-royals-23rd-match-1359497/full-scorecard",
                            "tbody_2955", "tbody_1110"))
 
+def match30():
+    asyncio.run(match_data(30, "LSG", "GT", "Atal Bihari Vajpayee Ekana Cricket Stadium", "GT", "bat", False, "GT",
+                           "135/6", "40/1", "128/7", "53/0", "Mohit Sharma",
+                           "https://sports.ndtv.com/cricket/lsg-vs-gt-scorecard-live-cricket-score-ipl-2023-match-30"
+                           "-lkoahm04222023222202",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/lucknow-super"
+                           "-giants-vs-gujarat-titans-30th-match-1359504/full-scorecard",
+                           "tbody_2955", "tbody_2954"))
+
 
 def match73():
     asyncio.run(
@@ -362,4 +371,5 @@ def match73():
 # match13()
 # match18()
 # match23()
+# match30()
 # match73()
