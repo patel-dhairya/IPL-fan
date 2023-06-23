@@ -340,6 +340,7 @@ def match23():
                            "-rajasthan-royals-23rd-match-1359497/full-scorecard",
                            "tbody_2955", "tbody_1110"))
 
+
 def match30():
     asyncio.run(match_data(30, "LSG", "GT", "Atal Bihari Vajpayee Ekana Cricket Stadium", "GT", "bat", False, "GT",
                            "135/6", "40/1", "128/7", "53/0", "Mohit Sharma",
@@ -348,6 +349,16 @@ def match30():
                            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/lucknow-super"
                            "-giants-vs-gujarat-titans-30th-match-1359504/full-scorecard",
                            "tbody_2955", "tbody_2954"))
+
+
+def match35():
+    asyncio.run(match_data(35, "GT", "MI", "Narendra Modi Stadium", "MI", "field", True, "GT", "207/6", "50/1", "152/9",
+                           "29/1", "Abhinav Manohar",
+                           "https://sports.ndtv.com/cricket/gt-vs-mi-scorecard-live-cricket-score-ipl-2023-match-35"
+                           "-ahmmi04252023222207",
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
+                           "-mumbai-indians-35th-match-1359509/full-scorecard",
+                           "tbody_2955", "tbody_1111"))
 
 
 def match73():
@@ -372,4 +383,5 @@ def match73():
 # match18()
 # match23()
 # match30()
+# match35()
 # match73()
