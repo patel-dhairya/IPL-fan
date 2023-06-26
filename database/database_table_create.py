@@ -46,11 +46,13 @@ def team_db_create() -> None:
 
     # Add teams background information to teams table
     # Note - Rajasthan Royals plays their home matches in either Assam or Jaipur
+    # Note - Punjab played one match at Dharamsala as their home team
     insert_team = "INSERT INTO teams (Team, \"Short Name\", \"Home Stadium\") VALUES (?, ?, ?)"
     ipl_db.execute(insert_team, ("Gujarat Titans", "GT", "Narendra Modi Stadium"))
     ipl_db.execute(insert_team, ("Chennai Super Kings", "CSK", "MA Chidambaram Stadium"))
     ipl_db.execute(insert_team, ("Delhi Capitals", "DC", "Arun Jaitley Stadium"))
     ipl_db.execute(insert_team, ("Punjab Kings", "PBKS", "Punjab Cricket Association IS Bindra Stadium"))
+    ipl_db.execute(insert_team, ("Punjab Kings", "PBKS", "Dharamsala Stadium"))
     ipl_db.execute(insert_team, ("Kolkata Knight Riders", "KKR", "Eden Gardens"))
     ipl_db.execute(insert_team, ("Mumbai Indians", "MI", "Wankhede Stadium"))
     ipl_db.execute(insert_team, ("Rajasthan Royals", "RR", "Barsapara Cricket Stadium"))
