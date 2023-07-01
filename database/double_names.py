@@ -9,7 +9,8 @@ name_corrections = {
     "Varun Chakaravarthy": "Varun Chakravarthy",
     "Aman Khan": "Aman Hakim Khan",
     "Philip Salt": "Phil Salt",
-    "Vyshak Vijay Kumar": "Vijaykumar Vyshak"
+    "Vyshak Vijay Kumar": "Vijaykumar Vyshak",
+    "Pravin Dubey": "Praveen Dubey"
 }
 
 

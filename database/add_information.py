@@ -420,6 +420,18 @@ def match15():
     )
 
 
+def match16():
+    asyncio.run(
+        match_data(
+            16, "DC", "MI", "Arun Jaitley Stadium", "MI", "field", True, "MI", "172/10", "51/1", "173/4", "68/0",
+            "Rohit Sharma",
+            "https://sports.ndtv.com/cricket/dc-vs-mi-scorecard-live-cricket-score-ipl-2023-match-16"
+            "-ddmi04112023222188",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/delhi-capitals-vs-mumbai-indians"
+            "-16th-match-1359490/full-scorecard"
+        )
+    )
+
 def match17():
     asyncio.run(match_data(17, "CSK", "RR", "MA Chidambaram Stadium", "CSK", "field", True, "RR", "175/8", "57/1",
                            "172/6", "45/1", "Ravichandran Ashwin",
@@ -516,6 +528,19 @@ def match27():
             "-kpbc04202023222199",
             "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/punjab-kings-vs-royal-challengers"
             "-bangalore-27th-match-1359501/full-scorecard"
+        )
+    )
+
+
+def match28():
+    asyncio.run(
+        match_data(
+            28, "DC", "KKR", "Arun Jaitley Stadium", "DC", "field", True, "DC", "127/10", "35/3", "128/6", "61/1",
+            "Ishant Sharma",
+            "https://sports.ndtv.com/cricket/dc-vs-kkr-scorecard-live-cricket-score-ipl-2023-match-28"
+            "-ddkr04202023222200",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/delhi-capitals-vs-kolkata-knight"
+            "-riders-28th-match-1359502/full-scorecard"
         )
     )
 
@@ -801,6 +826,18 @@ def match58():
     )
 
 
+def match59():
+    asyncio.run(
+        match_data(
+            59, "DC", "PBKS", "Arun Jaitley Stadium", "DC", "field", True, "PBKS", "167/7", "46/3", "136/8", "65/0",
+            "Prabhsimran Singh",
+            "https://sports.ndtv.com/cricket/dc-vs-pbks-scorecard-live-cricket-score-ipl-2023-match-59"
+            "-ddkp05132023222231",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/delhi-capitals-vs-punjab-kings"
+            "-59th-match-1359533/full-scorecard"
+        )
+    )
+
 def match60():
     asyncio.run(match_data(60, "RR", "RCB", "Sawai Mansingh Stadium", "RCB", "bat", False, "RCB", "171/5", "42/0",
                            "59/10", "28/5", "Wayne Parnell",
@@ -831,6 +868,18 @@ def match62():
                            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
                            "-sunrisers-hyderabad-62nd-match-1359536/full-scorecard"))
 
+
+def match64():
+    asyncio.run(
+        match_data(
+            64, "PBKS", "DC", "Dharamsala Stadium", "PBKS", "field", True, "DC", "213/2", "61/0", "198/8", "47/1",
+            "Rilee Rossouw",
+            "https://sports.ndtv.com/cricket/pbks-vs-dc-scorecard-live-cricket-score-ipl-2023-match-64"
+            "-kpdd05172023222236",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/punjab-kings-vs-delhi-capitals"
+            "-64th-match-1359538/full-scorecard"
+        )
+    )
 
 def match65():
     asyncio.run(
@@ -940,6 +989,7 @@ def match74():
 # match13()
 # match14()
 # match15()
+# match16()
 # match17()
 # match18()
 # match19()
@@ -949,6 +999,7 @@ def match74():
 # match25()
 # match26()
 # match27()
+# match28()
 # match29()
 # match30()
 # match32()
@@ -975,9 +1026,11 @@ def match74():
 # match56()
 # match57()
 # match58()
+# match59()
 # match60()
 # match61()
 # match62()
+# match64()
 # match65()
 # match66()
 # match67()
