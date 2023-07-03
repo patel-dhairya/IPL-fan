@@ -320,9 +320,9 @@ def add_match(match_id: int, home_team: str, away_team: str, stadium: str, toss_
             ipl_cursor.close()
         return f"Match-{match_id}) {home_team} vs {away_team} added successfully."
 
-    except sqlite3.IntegrityError:
-        print("Integrity Error, Match already exist")
-        return f"Match-{match_id} already exist in database"
+    except sqlite3.IntegrityError as e:
+        print(e)
+        return f"{e}"
 
     except Exception as e:
         print(e)

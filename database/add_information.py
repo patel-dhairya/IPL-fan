@@ -491,6 +491,19 @@ def match21():
     )
 
 
+def match22():
+    asyncio.run(
+        match_data(
+            22, "MI", "KKR", "Wankhede Stadium", "MI", "field", False, "MI", "185/6", "57/2", "186/5", "72/1",
+            "Venkatesh Iyer",
+            "https://sports.ndtv.com/cricket/mi-vs-kkr-scorecard-live-cricket-score-ipl-2023-match-22"
+            "-mikr04162023222194",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/mumbai-indians-vs-kolkata-knight"
+            "-riders-22nd-match-1359496/full-scorecard"
+        )
+    )
+
+
 def match23():
     asyncio.run(match_data(23, "GT", "RR", "Narendra Modi Stadium", "RR", "field", True, "RR", "177/7", "42/2", "179/7",
                            "26/2", "Shimron Hetmyer",
@@ -601,8 +614,8 @@ def match32():
                            "182/6", "47/1", "Glenn Maxwell",
                            "https://sports.ndtv.com/cricket/rcb-vs-rr-scorecard-live-cricket-score-ipl-2023-match-32"
                            "-bcrr04232023222204",
-                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/match-schedule"
-                           "-fixtures-and-results?team=4345"))
+                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/royal-challengers"
+                           "-bangalore-vs-rajasthan-royals-32nd-match-1359506/full-scorecard"))
 
 
 def match33():
@@ -666,7 +679,7 @@ def match38():
     asyncio.run(
         match_data(
             38, "PBKS", "LSG", "Punjab Cricket Association IS Bindra Stadium", "PBKS", "field", True, "LSG", "257/5",
-            "74/2", "201", "55/2", "Marcus Stoinis",
+            "74/2", "201/10", "55/2", "Marcus Stoinis",
             "https://sports.ndtv.com/cricket/pbks-vs-lsg-scorecard-live-cricket-score-ipl-2023-match-38"
             "-kplko04282023222210",
             "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/punjab-kings-vs-lucknow-super"
@@ -939,6 +952,19 @@ def match62():
                            "-sunrisers-hyderabad-62nd-match-1359536/full-scorecard"))
 
 
+def match63():
+    asyncio.run(
+        match_data(
+            63, "LSG", "MI", "Atal Bihari Vajpayee Ekana Cricket Stadium", "MI", "field", True, "LSG", "177/3", "35/2",
+            "172/5", "58/0", "Marcus Stoinis",
+            "https://sports.ndtv.com/cricket/lsg-vs-mi-scorecard-live-cricket-score-ipl-2023-match-63"
+            "-lkomi05162023222235",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/lucknow-super-giants-vs-mumbai"
+            "-indians-63rd-match-1359537/full-scorecard"
+        )
+    )
+
+
 def match64():
     asyncio.run(
         match_data(
@@ -987,6 +1013,19 @@ def match67():
     )
 
 
+def match68():
+    asyncio.run(
+        match_data(
+            68, "KKR", "LSG", "Eden Gardens", "KKR", "field", True, "LSG", "176/8", "54/1", "175/7", "61/1",
+            "Nicholas Pooran",
+            "https://sports.ndtv.com/cricket/kkr-vs-lsg-scorecard-live-cricket-score-ipl-2023-match-68"
+            "-krlko05202023222240",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/kolkata-knight-riders-vs-lucknow"
+            "-super-giants-68th-match-1359542/full-scorecard"
+        )
+    )
+
+
 def match69():
     asyncio.run(
         match_data(
@@ -1018,6 +1057,20 @@ def match71():
             "-ahmck05232023225987",
             "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/chennai-super-kings-vs-gujarat"
             "-titans-qualifier-1-1370350/full-scorecard"
+        )
+    )
+
+
+def match72():
+    # Technically not really a home match for MI but just so I can scrap data
+    asyncio.run(
+        match_data(
+            72, "MI", "LSG", "MA Chidambaram Stadium", "MI", "bat", True, "MI", "182/8", "62/2", "101/10", "54/2",
+            "Akash Madhwal",
+            "https://sports.ndtv.com/cricket/lsg-vs-mi-scorecard-live-cricket-score-ipl-2023-eliminator"
+            "-lkomi05242023225988",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/lucknow-super-giants-vs-mumbai"
+            "-indians-eliminator-1370351/full-scorecard"
         )
     )
 
@@ -1066,6 +1119,7 @@ def match74():
 # match19()
 # match20()
 # match21()
+# match22()
 # match23()
 # match24()
 # match25()
@@ -1106,12 +1160,15 @@ def match74():
 # match60()
 # match61()
 # match62()
+# match63()
 # match64()
 # match65()
 # match66()
 # match67()
+# match68()
 # match69()
 # match70()
 # match71()
+# match72()
 # match73()
 # match74()
