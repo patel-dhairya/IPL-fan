@@ -59,47 +59,58 @@ def research_question2(pd_data: pd.DataFrame):
           "between a team's performance in the power play and their overall match outcomes")
     print("Answer - 2")
 
-    print(pd_data.head(5))
-
     # First convert powerplay score to runs only. Powerplay scores are currently in format of runs/wickets
-    inning1_pp_score = pd_data["Powerplay score(i1)"].split("/")[0].astype(int)
-    inning2_pp_score = pd_data["Powerplay score(i2)"].split("/")[0].astype(int)
-    run_difference = (inning1_pp_score - inning2_pp_score).tolist()
-
-    # Now let's get the winning team data series
-    winning_team = pd_data["Winner"]
-
-    # Now let's create a new data-series which will store weather team that was in lead during powerplay won the match
-    # or not
-    inning1_teams = []
-    inning2_teams = []
+    # We also need to create a new data-series which will store which team was in lead during powerplay
+    leading_teams = []
     for index, row in pd_data.iterrows():
+        inning1_pp_score = int(row["Powerplay score(i1)"].split("/")[0])
+        inning2_pp_score = int(row["Powerplay score(i2)"].split("/")[0])
+        run_difference = inning1_pp_score - inning2_pp_score
         home_team, away_team = row["Home Team"], row["Away Team"]
         toss_winner, toss_decision = row["Toss Win"], row["Field First"]
         if toss_decision == 1:
-            inning2_teams.append(toss_winner)
+            inning2_team = toss_winner
             if toss_winner == home_team:
-                inning1_teams.append(away_team)
+                inning1_team = away_team
             else:
-                inning1_teams.append(home_team)
+                inning1_team = home_team
         else:
-            inning1_teams.append(toss_winner)
+            inning1_team = toss_winner
             if toss_winner == home_team:
-                inning2_teams.append(away_team)
+                inning2_team = away_team
             else:
-                inning2_teams.append(home_team)
-
-    # Now create a new list which provide team that was ahead in powerplay
-    powerplay_lead = []
-    for index, run_diff in enumerate(run_difference):
-        if run_diff >= 0:
-            powerplay_lead.append(inning1_teams[index])
+                inning2_team = home_team
+        # In case of two teams were at same runs at end of powerplay, I will give preference to team that batted first
+        if run_difference >= 0:
+            leading_teams.append(inning1_team)
         else:
-            powerplay_lead.append(inning2_teams[index])
-    print(powerplay_lead)
+            leading_teams.append(inning2_team)
+
+    # Now let's get the winning team data series
+    winning_team = pd_data["Winner"].tolist()
+
+    # Now let's compare them to find out how many teams were able to convert powerplay advantage
+    team_with_powerplay_lead_won = 0
+    for index in range(len(winning_team)):
+        if winning_team[index] == leading_teams[index]:
+            team_with_powerplay_lead_won += 1
+        else:
+            continue
+
+    # percentage teams that won
+    conversion_percentage = (team_with_powerplay_lead_won / len(winning_team)) * 100
+    print(f"The percentage of teams that converted their power play runs lead into victory is: "
+          f"{conversion_percentage:.2f}%")
+    print("Conclusion for Question-2")
+    print("With a percentage as high as 68.49%, it indicates that teams that were in the lead during the powerplay "
+          "phase tended to win the match more often than not. This suggests that having a strong performance during "
+          "the powerplay can provide a significant advantage in achieving a positive outcome in the match.However, "
+          "it is important to note that correlation does not necessarily imply causation. While a high conversion "
+          "percentage indicates a strong association between powerplay lead and match victory, it does not guarantee "
+          "that having the powerplay lead always guarantees a win.")
 
 
-    # def research_question2(p_data: pd.DataFrame):
+# def research_question2(p_data: pd.DataFrame):
 #     print("Question - 2")
 #     print("""As we know most of the time each person has one dominant hand. Very few people are ambidextrous. So,
 #     I would like to check weather this is also true in case of cricket.I would like to check if there is significant
@@ -141,4 +152,4 @@ def research_question2(pd_data: pd.DataFrame):
 
 
 # research_question1(player_data)
-research_question2(matches_datafile)
+# research_question2(matches_datafile)
