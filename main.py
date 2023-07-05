@@ -2,12 +2,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency
 import seaborn as sns
+import sqlite3
 
 player_data = pd.read_csv("database/player_data.csv")
 
+conn = sqlite3.connect('database/ipl.db')
+matches_datafile = pd.read_sql_query("SELECT * FROM matches", conn)
+conn.close()
+
 
 def research_question1(pd_data):
-    print("Question - 1")
+    print("Analysis - 1")
     print("Are player positions structured the same across all teams? What I would like to know is whether all teams"
           "have a similar ratio for different roles, such as batsmen, bowlers, wicketkeepers, and so on.")
     print("Answer - 1")
@@ -44,7 +49,57 @@ def research_question1(pd_data):
           "variation in player positions across different teams.")
 
 
-# def research_question2(p_data: pd.DataFrame):
+def research_question2(pd_data: pd.DataFrame):
+    print("Analysis - 2")
+    print("Powerplay. A important part of modern fast paced cricket. So, what is powerplay exactly? Well, based on "
+          "wikipedia entry: In a powerplay, restrictions are applied on the fielding team, with only two fielders "
+          "allowed outside the 30-yard circle for a set number of overs. In 20 overs match, first six overs are "
+          "powerplay overs. It is good opportunity for batters to set tone for the inning. My question is "
+          "does teams who utilises powerplay more efficiently wins the match? I would like to know correlation "
+          "between a team's performance in the power play and their overall match outcomes")
+    print("Answer - 2")
+
+    print(pd_data.head(5))
+
+    # First convert powerplay score to runs only. Powerplay scores are currently in format of runs/wickets
+    inning1_pp_score = pd_data["Powerplay score(i1)"].split("/")[0].astype(int)
+    inning2_pp_score = pd_data["Powerplay score(i2)"].split("/")[0].astype(int)
+    run_difference = (inning1_pp_score - inning2_pp_score).tolist()
+
+    # Now let's get the winning team data series
+    winning_team = pd_data["Winner"]
+
+    # Now let's create a new data-series which will store weather team that was in lead during powerplay won the match
+    # or not
+    inning1_teams = []
+    inning2_teams = []
+    for index, row in pd_data.iterrows():
+        home_team, away_team = row["Home Team"], row["Away Team"]
+        toss_winner, toss_decision = row["Toss Win"], row["Field First"]
+        if toss_decision == 1:
+            inning2_teams.append(toss_winner)
+            if toss_winner == home_team:
+                inning1_teams.append(away_team)
+            else:
+                inning1_teams.append(home_team)
+        else:
+            inning1_teams.append(toss_winner)
+            if toss_winner == home_team:
+                inning2_teams.append(away_team)
+            else:
+                inning2_teams.append(home_team)
+
+    # Now create a new list which provide team that was ahead in powerplay
+    powerplay_lead = []
+    for index, run_diff in enumerate(run_difference):
+        if run_diff >= 0:
+            powerplay_lead.append(inning1_teams[index])
+        else:
+            powerplay_lead.append(inning2_teams[index])
+    print(powerplay_lead)
+
+
+    # def research_question2(p_data: pd.DataFrame):
 #     print("Question - 2")
 #     print("""As we know most of the time each person has one dominant hand. Very few people are ambidextrous. So,
 #     I would like to check weather this is also true in case of cricket.I would like to check if there is significant
@@ -85,5 +140,5 @@ def research_question1(pd_data):
 #     also effects cricketers.""")
 
 
-research_question1(player_data)
-# research_question2(player_data)
+# research_question1(player_data)
+research_question2(matches_datafile)
