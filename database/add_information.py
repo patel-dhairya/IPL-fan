@@ -88,6 +88,11 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
             fielders = dismissal_reason[dismissal_reason.index('(') + 1: dismissal_reason.index(')')].split('/')
             return ["run-out", fielders[-1].strip()]
 
+        # Check if player got out because of hit wicket
+        elif "hit wicket" in dismissal_reason:
+            bowler = dismissal_reason.split("b ")[1]
+            return ["hit-wicket", bowler.strip()]
+
         # Default case if dismissal reason does not match any known patterns
         return None
 
@@ -159,7 +164,8 @@ async def match_data(match_id: int, home_team: str, away_team: str, stadium: str
         elif dismissal_type[0] == "lbw":
             bowler_lbw[dismissal_type[1]] += 1
             wicket_taken_bowler = dismissal_type[1]
-        elif dismissal_type[0] == "bowled":
+        # For easier analysis, hit wicket is also considered bowled in this database
+        elif dismissal_type[0] == "bowled" or dismissal_type[0] == "hit-wicket":
             bowler_bowled[dismissal_type[1]] += 1
             wicket_taken_bowler = dismissal_type[1]
         else:
@@ -388,12 +394,13 @@ def match12():
 
 
 def match13():
-    asyncio.run(match_data(13, "GT", "KKR", "Narendra Modi Stadium", "GT", "field", False, "KKR", "204/4", "54/1",
-                           "207/7", "43/2", "Rinku Singh",
-                           "https://sports.ndtv.com/cricket/gt-vs-kkr-scorecard-live-cricket-score-ipl-2023-match-13"
-                           "-ahmkr04092023222185",
-                           "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
-                           "-kolkata-knight-riders-13th-match-1359487/full-scorecard"))
+    asyncio.run(
+        match_data(
+            13, "GT", "KKR", "Narendra Modi Stadium", "GT", "bat", False, "KKR", "204/4", "54/1", "207/7", "43/2",
+            "Rinku Singh",
+            "https://sports.ndtv.com/cricket/gt-vs-kkr-scorecard-live-cricket-score-ipl-2023-match-13-ahmkr04092023222185",
+            "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs"
+            "-kolkata-knight-riders-13th-match-1359487/full-scorecard"))
 
 
 def match14():
@@ -415,7 +422,7 @@ def match15():
             15, "RCB", "LSG", "M.Chinnaswamy Stadium", "LSG", "field", True, "LSG", "212/2", "56/0", "213/9", "37/3",
             "Nicholas Pooran",
             "https://sports.ndtv.com/cricket/rcb-vs-lsg-scorecard-live-cricket-score-ipl-2023-match-15"
-            "-bclko041020232221871",
+            "-bclko04102023222187",
             "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/royal-challengers-bangalore-vs"
             "-lucknow-super-giants-15th-match-1359489/full-scorecard"
         )
