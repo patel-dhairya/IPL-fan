@@ -361,7 +361,7 @@ def match9():
 def match10():
     asyncio.run(
         match_data(
-            10, "SRH", "LSG", "Atal Bihari Vajpayee Ekana Cricket Stadium", "SRH", "bat", True, "LSG", "121/8", "43/1",
+            10, "LSG", "SRH", "Atal Bihari Vajpayee Ekana Cricket Stadium", "SRH", "bat", True, "LSG", "121/8", "43/1",
             "127/5", "45/2", "Krunal Pandya",
             "https://sports.ndtv.com/cricket/lsg-vs-srh-scorecard-live-cricket-score-ipl-2023-match-10"
             "-lkosh04072023222180",
@@ -721,7 +721,7 @@ def match40():
 def match41():
     asyncio.run(
         match_data(
-            41, "CSK", "PBKS", "M.Chinnaswamy Stadium", "CSK", "bat", False, "PBKS", "200/4", "57/0", "201/6", "62/1",
+            41, "CSK", "PBKS", "MA Chidambaram Stadium", "CSK", "bat", False, "PBKS", "200/4", "57/0", "201/6", "62/1",
             "Devon Conway",
             "https://sports.ndtv.com/cricket/csk-vs-pbks-scorecard-live-cricket-score-ipl-2023-match-41"
             "-ckkp04302023222213",
